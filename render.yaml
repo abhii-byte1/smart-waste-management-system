@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: smart-waste-management
+    env: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false # User will supply their MongoDB Atlas connection string during deployment
+      - key: JWT_SECRET
+        generateValue: true # Render will automatically generate a secure random secret
+      - key: CLIENT_URL
+        sync: false # User will supply the deployed URL (e.g. https://smart-waste-management.onrender.com)

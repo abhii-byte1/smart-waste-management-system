@@ -14,6 +14,13 @@ const __dirname = path.dirname(__filename);
 
 // Load .env from backend/ directory (works from any cwd)
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+
+console.log('--- Startup Environment Verification ---');
+console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'LOADED' : 'MISSING');
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'LOADED' : 'MISSING');
+console.log('CLIENT_URL:', process.env.CLIENT_URL ? 'LOADED' : 'MISSING');
+console.log('----------------------------------------');
+
 await connectDB();
 
 const app = express();
