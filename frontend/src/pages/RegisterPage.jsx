@@ -31,7 +31,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <section className="flex min-h-[75vh] items-center justify-center">
+    <section className="flex min-h-[60vh] items-center justify-center px-4 sm:min-h-[75vh]">
       <AuthForm
         title="Create Account"
         subtitle="Start reporting waste issues in your area with real-time tracking."

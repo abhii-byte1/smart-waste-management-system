@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import api from '../api/client.js';
+import { buttonTap, fadeInUp } from '../utils/motion.js';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 const initialState = {
@@ -98,23 +100,33 @@ const ComplaintForm = ({ onCreated, disabled }) => {
   };
 
   const inputClassName =
-    'mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition focus:border-brand-500';
+    'mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none transition-all duration-200 focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30';
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur">
-      <div className="flex items-start justify-between gap-4">
+    <motion.form
+      onSubmit={handleSubmit}
+      variants={fadeInUp}
+      initial="hidden"
+      animate="visible"
+      className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur sm:rounded-[2rem] sm:p-6"
+    >
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-white">Report a Waste Issue</h2>
-          <p className="mt-2 text-sm text-slate-300">
+          <h2 className="text-lg font-semibold text-white sm:text-xl">Report a Waste Issue</h2>
+          <p className="mt-1.5 text-sm text-slate-300 sm:mt-2">
             Submit a complaint with location details. The backend will auto-classify urgency.
           </p>
         </div>
-        <div className="rounded-full bg-brand-500/15 px-3 py-1 text-xs text-brand-100 ring-1 ring-brand-400/30">
+        <motion.div
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-fit rounded-full bg-brand-500/15 px-3 py-1 text-xs text-brand-100 ring-1 ring-brand-400/30"
+        >
           AI Prioritization
-        </div>
+        </motion.div>
       </div>
 
-      <div className="mt-6 grid gap-5">
+      <div className="mt-5 grid gap-4 sm:mt-6 sm:gap-5">
         <label className="text-sm text-slate-200">
           Location
           <input
@@ -125,7 +137,18 @@ const ComplaintForm = ({ onCreated, disabled }) => {
             className={inputClassName}
             disabled={disabled || submitting}
           />
-          {errors.location && <span className="mt-1 block text-xs text-red-300">{errors.location}</span>}
+          <AnimatePresence>
+            {errors.location && (
+              <motion.span
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="mt-1 block text-xs text-red-300"
+              >
+                {errors.location}
+              </motion.span>
+            )}
+          </AnimatePresence>
         </label>
 
         <label className="text-sm text-slate-200">
@@ -134,12 +157,23 @@ const ComplaintForm = ({ onCreated, disabled }) => {
             name="description"
             value={form.description}
             onChange={handleChange}
-            rows="5"
+            rows="4"
             placeholder="Describe the issue, smell, overflow, risk level, nearby landmarks, and urgency."
             className={inputClassName}
             disabled={disabled || submitting}
           />
-          {errors.description && <span className="mt-1 block text-xs text-red-300">{errors.description}</span>}
+          <AnimatePresence>
+            {errors.description && (
+              <motion.span
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="mt-1 block text-xs text-red-300"
+              >
+                {errors.description}
+              </motion.span>
+            )}
+          </AnimatePresence>
         </label>
 
         <div className="text-sm text-slate-200">
@@ -149,44 +183,67 @@ const ComplaintForm = ({ onCreated, disabled }) => {
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="mt-2 block w-full rounded-2xl border border-dashed border-white/15 bg-slate-950/40 px-4 py-3 text-sm text-slate-300 file:mr-4 file:rounded-full file:border-0 file:bg-brand-500 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+              className="mt-2 block w-full rounded-2xl border border-dashed border-white/15 bg-slate-950/40 px-3 py-3 text-sm text-slate-300 file:mr-3 file:rounded-full file:border-0 file:bg-brand-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white sm:px-4 sm:file:mr-4 sm:file:px-4 sm:file:py-2 sm:file:text-sm"
               disabled={disabled || submitting}
             />
           </label>
 
           <p className="mt-2 text-xs text-slate-400">Supported image files up to 2 MB. Stored as a data URL in this MVP.</p>
           {fileName && <p className="mt-2 text-xs text-brand-100">Selected: {fileName}</p>}
-          {errors.image && <span className="mt-1 block text-xs text-red-300">{errors.image}</span>}
+          <AnimatePresence>
+            {errors.image && (
+              <motion.span
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="mt-1 block text-xs text-red-300"
+              >
+                {errors.image}
+              </motion.span>
+            )}
+          </AnimatePresence>
 
-          {form.image && (
-            <div className="mt-4 overflow-hidden rounded-3xl border border-white/10 bg-slate-950/50 p-3">
-              <img src={form.image} alt="Preview" className="h-56 w-full rounded-2xl object-cover" />
-              <div className="mt-3 flex justify-end">
-                <button
-                  type="button"
-                  onClick={clearImage}
-                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white transition hover:bg-white/10"
-                  disabled={disabled || submitting}
-                >
-                  Remove Image
-                </button>
-              </div>
-            </div>
-          )}
+          <AnimatePresence>
+            {form.image && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mt-4 overflow-hidden rounded-3xl border border-white/10 bg-slate-950/50 p-3"
+              >
+                <img src={form.image} alt="Preview" className="h-40 w-full rounded-2xl object-cover sm:h-56" />
+                <div className="mt-3 flex justify-end">
+                  <motion.button
+                    type="button"
+                    onClick={clearImage}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={buttonTap}
+                    className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white transition hover:bg-white/10"
+                    disabled={disabled || submitting}
+                  >
+                    Remove Image
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <button
+      <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center">
+        <motion.button
           type="submit"
           disabled={disabled || submitting}
-          className="rounded-full bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+          whileHover={{ scale: 1.03 }}
+          whileTap={buttonTap}
+          className="w-full rounded-full bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {submitting ? 'Submitting...' : 'Submit Complaint'}
-        </button>
-        <p className="text-xs text-slate-400">Map picker ready for future Google Maps integration.</p>
+        </motion.button>
+        <p className="text-center text-xs text-slate-400 sm:text-left">Map picker ready for future Google Maps integration.</p>
       </div>
-    </form>
+    </motion.form>
   );
 };
 

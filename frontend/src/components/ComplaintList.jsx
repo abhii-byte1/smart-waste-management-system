@@ -1,5 +1,7 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import ComplaintCard from './ComplaintCard.jsx';
 import EmptyState from './EmptyState.jsx';
+import { staggerContainer } from '../utils/motion.js';
 
 const ComplaintList = ({ complaints }) => {
   if (!complaints.length) {
@@ -12,11 +14,18 @@ const ComplaintList = ({ complaints }) => {
   }
 
   return (
-    <div className="grid gap-4">
-      {complaints.map((complaint) => (
-        <ComplaintCard key={complaint._id} complaint={complaint} />
-      ))}
-    </div>
+    <motion.div
+      className="grid gap-3 sm:gap-4"
+      variants={staggerContainer(0.08)}
+      initial="hidden"
+      animate="visible"
+    >
+      <AnimatePresence mode="popLayout">
+        {complaints.map((complaint) => (
+          <ComplaintCard key={complaint._id} complaint={complaint} />
+        ))}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
