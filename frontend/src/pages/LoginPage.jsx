@@ -22,7 +22,7 @@ const LoginPage = () => {
     event.preventDefault();
     try {
       const user = await login(form);
-      navigate(user.role === 'admin' ? '/dashboard' : '/');
+      navigate(user.role === 'admin' ? '/admin/dashboard' : '/');
     } catch {
       // Toast is handled in auth context.
     }

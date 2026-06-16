@@ -31,14 +31,16 @@ const HomePage = () => {
           </p>
           <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
             {user ? (
-              <motion.a
-                href="#report"
-                whileHover={{ scale: 1.04 }}
-                whileTap={buttonTap}
-                className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600"
-              >
-                Report Issue
-              </motion.a>
+              user.role !== 'admin' && (
+                <motion.a
+                  href="#report"
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={buttonTap}
+                  className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600"
+                >
+                  Report Issue
+                </motion.a>
+              )
             ) : (
               <motion.div whileHover={{ scale: 1.04 }} whileTap={buttonTap}>
                 <Link to="/register" className="inline-block rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
@@ -46,14 +48,6 @@ const HomePage = () => {
                 </Link>
               </motion.div>
             )}
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={buttonTap}>
-              <Link
-                to={user?.role === 'admin' ? '/dashboard' : '/login'}
-                className="inline-block rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/10"
-              >
-                {user?.role === 'admin' ? 'Open Dashboard' : 'Admin Login'}
-              </Link>
-            </motion.div>
           </div>
         </motion.div>
 
@@ -72,7 +66,23 @@ const HomePage = () => {
       <section className="grid gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr]">
         <motion.div id="report" variants={slideInLeft} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
           {user ? (
-            <ComplaintForm onCreated={refetch} />
+            user.role === 'admin' ? (
+              <div className="rounded-2xl border border-white/[0.06] bg-surface/50 p-5 backdrop-blur sm:rounded-3xl sm:p-8">
+                <h2 className="text-xl font-semibold text-white sm:text-2xl">Admin Portal</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-400 sm:mt-3">
+                  Administrators cannot submit new complaints. Please use the Command Center to manage active reports.
+                </p>
+                <div className="mt-5 sm:mt-6">
+                  <motion.div whileHover={{ scale: 1.04 }} whileTap={buttonTap} className="inline-block">
+                    <Link to="/dashboard" className="inline-block rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
+                      Open Command Center
+                    </Link>
+                  </motion.div>
+                </div>
+              </div>
+            ) : (
+              <ComplaintForm onCreated={refetch} />
+            )
           ) : (
             <div className="rounded-2xl border border-white/[0.06] bg-surface/50 p-5 backdrop-blur sm:rounded-3xl sm:p-8">
               <h2 className="text-xl font-semibold text-white sm:text-2xl">Sign in to submit a complaint</h2>
@@ -101,7 +111,7 @@ const HomePage = () => {
               <h2 className="text-xl font-semibold text-white sm:text-2xl">Complaint Tracking</h2>
               <p className="mt-1.5 text-sm text-slate-400 sm:mt-2">View your submitted complaints and monitor live status updates.</p>
             </div>
-            {user && (
+            {user && user.role !== 'admin' && (
               <motion.button
                 type="button"
                 onClick={refetch}
@@ -115,7 +125,15 @@ const HomePage = () => {
               </motion.button>
             )}
           </div>
-          {user && (loading ? <Loader text="Loading your complaints..." /> : <ComplaintList complaints={complaints} />)}
+          {user && (
+            user.role === 'admin' ? (
+              <div className="rounded-2xl border border-dashed border-white/10 bg-surface/50 p-6 text-center text-sm text-slate-400 sm:p-8">
+                Complaint tracking is available for citizens only.
+              </div>
+            ) : (
+              loading ? <Loader text="Loading your complaints..." /> : <ComplaintList complaints={complaints} />
+            )
+          )}
         </motion.div>
       </section>
     </div>
