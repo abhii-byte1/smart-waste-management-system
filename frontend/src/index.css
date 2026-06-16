@@ -6,8 +6,8 @@
 
 :root {
   color: #e5eef5;
-  background: #06131c;
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #13151A; /* Dark outer background */
+  font-family: 'Inter', sans-serif;
 }
 
 html {
@@ -19,7 +19,7 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background: #041018;
+  background: #13151A;
   color: #e5eef5;
   overflow-x: hidden;
 }
@@ -33,196 +33,69 @@ body {
 }
 
 /* ═══════════════════════════════════════════
+   Exact Match Neon Glow Cards
+   ═══════════════════════════════════════════ */
+.glow-exact-purple {
+  border: 1.5px solid rgba(168, 85, 247, 0.7);
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.25), inset 0 0 15px rgba(168, 85, 247, 0.1);
+}
+
+.glow-exact-red {
+  border: 1.5px solid rgba(239, 68, 68, 0.7);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.25), inset 0 0 15px rgba(239, 68, 68, 0.1);
+}
+
+.glow-exact-blue {
+  border: 1.5px solid rgba(59, 130, 246, 0.7);
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.25), inset 0 0 15px rgba(59, 130, 246, 0.1);
+}
+
+.glow-exact-cyan {
+  border: 1.5px solid rgba(6, 182, 212, 0.8);
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.3), inset 0 0 15px rgba(6, 182, 212, 0.15);
+}
+
+.glow-exact-green {
+  border: 1.5px solid rgba(34, 197, 94, 0.7);
+  box-shadow: 0 0 25px rgba(34, 197, 94, 0.25), inset 0 0 15px rgba(34, 197, 94, 0.1);
+}
+
+/* Priority Hollow Badges */
+.badge-hollow-red {
+  border: 1px solid rgba(239, 68, 68, 0.8);
+  color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3), inset 0 0 8px rgba(239, 68, 68, 0.15);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.badge-hollow-blue {
+  border: 1px solid rgba(59, 130, 246, 0.8);
+  color: #3b82f6;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3), inset 0 0 8px rgba(59, 130, 246, 0.15);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.badge-hollow-green {
+  border: 1px solid rgba(34, 197, 94, 0.8);
+  color: #22c55e;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.3), inset 0 0 8px rgba(34, 197, 94, 0.15);
+  background: rgba(34, 197, 94, 0.05);
+}
+
+/* ═══════════════════════════════════════════
    Custom Scrollbar
    ═══════════════════════════════════════════ */
-::-webkit-scrollbar {
-  width: 5px;
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* ═══════════════════════════════════════════
-   Neon Glow Card Borders
-   ═══════════════════════════════════════════ */
-.glow-card-green {
-  border: 1px solid rgba(20, 184, 122, 0.35);
-  box-shadow: 0 0 15px rgba(20, 184, 122, 0.15), inset 0 0 20px rgba(20, 184, 122, 0.04);
-  transition: all 0.3s ease;
-}
-.glow-card-green:hover {
-  border-color: rgba(20, 184, 122, 0.6);
-  box-shadow: 0 0 30px rgba(20, 184, 122, 0.3), inset 0 0 30px rgba(20, 184, 122, 0.07);
-}
-
-.glow-card-red {
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.15), inset 0 0 20px rgba(239, 68, 68, 0.04);
-  transition: all 0.3s ease;
-}
-.glow-card-red:hover {
-  border-color: rgba(239, 68, 68, 0.6);
-  box-shadow: 0 0 30px rgba(239, 68, 68, 0.3), inset 0 0 30px rgba(239, 68, 68, 0.07);
-}
-
-.glow-card-cyan {
-  border: 1px solid rgba(34, 211, 238, 0.35);
-  box-shadow: 0 0 15px rgba(34, 211, 238, 0.15), inset 0 0 20px rgba(34, 211, 238, 0.04);
-  transition: all 0.3s ease;
-}
-.glow-card-cyan:hover {
-  border-color: rgba(34, 211, 238, 0.6);
-  box-shadow: 0 0 30px rgba(34, 211, 238, 0.3), inset 0 0 30px rgba(34, 211, 238, 0.07);
-}
-
-.glow-card-amber {
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.15), inset 0 0 20px rgba(245, 158, 11, 0.04);
-  transition: all 0.3s ease;
-}
-.glow-card-amber:hover {
-  border-color: rgba(245, 158, 11, 0.6);
-  box-shadow: 0 0 30px rgba(245, 158, 11, 0.3), inset 0 0 30px rgba(245, 158, 11, 0.07);
-}
-
-/* ═══════════════════════════════════════════
-   Floating Neon Particles
-   ═══════════════════════════════════════════ */
-.neon-particle {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.12;
-  animation: float-particle 20s infinite ease-in-out;
-}
-
-.particle-1 {
-  width: 350px;
-  height: 350px;
-  background: rgba(20, 184, 122, 0.5);
-  top: 5%;
-  left: 3%;
-  animation-delay: 0s;
-}
-
-.particle-2 {
-  width: 250px;
-  height: 250px;
-  background: rgba(34, 211, 238, 0.4);
-  top: 55%;
-  right: 8%;
-  animation-delay: -7s;
-}
-
-.particle-3 {
-  width: 300px;
-  height: 300px;
-  background: rgba(20, 184, 122, 0.3);
-  bottom: 5%;
-  left: 35%;
-  animation-delay: -14s;
-}
-
-.particle-4 {
-  width: 180px;
-  height: 180px;
-  background: rgba(239, 68, 68, 0.25);
-  top: 25%;
-  right: 20%;
-  animation-delay: -4s;
-}
-
-@keyframes float-particle {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(40px, -50px) scale(1.1); }
-  50% { transform: translate(-30px, 30px) scale(0.9); }
-  75% { transform: translate(20px, 40px) scale(1.05); }
-}
-
-/* ═══════════════════════════════════════════
-   Neon Line Accents
-   ═══════════════════════════════════════════ */
-.neon-line {
-  position: absolute;
-  height: 2px;
-  border-radius: 2px;
-  filter: blur(1px);
-  opacity: 0.2;
-  animation: neon-sweep 8s infinite ease-in-out;
-}
-
-.neon-line-1 {
-  width: 200px;
-  background: linear-gradient(90deg, transparent, #14b87a, transparent);
-  top: 15%;
-  left: -200px;
-  animation-delay: 0s;
-}
-
-.neon-line-2 {
-  width: 150px;
-  background: linear-gradient(90deg, transparent, #22d3ee, transparent);
-  top: 45%;
-  left: -150px;
-  animation-delay: -3s;
-}
-
-.neon-line-3 {
-  width: 180px;
-  background: linear-gradient(90deg, transparent, #14b87a, transparent);
-  top: 75%;
-  left: -180px;
-  animation-delay: -6s;
-}
-
-@keyframes neon-sweep {
-  0% { transform: translateX(0); opacity: 0; }
-  10% { opacity: 0.3; }
-  90% { opacity: 0.3; }
-  100% { transform: translateX(calc(100vw + 400px)); opacity: 0; }
-}
-
-/* ═══════════════════════════════════════════
-   Loader Animation
-   ═══════════════════════════════════════════ */
+/* Loader */
 @keyframes loader-bounce {
-  0%, 80%, 100% {
-    transform: scale(0.6);
-    opacity: 0.4;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
 }
-
-.loader-dot {
-  animation: loader-bounce 1.2s infinite ease-in-out;
-}
-
+.loader-dot { animation: loader-bounce 1.2s infinite ease-in-out; }
 .loader-dot:nth-child(1) { animation-delay: -0.32s; }
 .loader-dot:nth-child(2) { animation-delay: -0.16s; }
 .loader-dot:nth-child(3) { animation-delay: 0s; }
-
-/* ═══════════════════════════════════════════
-   Mobile Touch Improvements
-   ═══════════════════════════════════════════ */
-@media (max-width: 640px) {
-  button, a, select {
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  input, textarea, select {
-    font-size: 16px;
-  }
-}
