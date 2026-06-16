@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import api from '../api/client.js';
@@ -26,7 +26,7 @@ const ComplaintForm = ({ onCreated, disabled }) => {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleLocationSelect = async (coords) => {
+  const handleLocationSelect = useCallback(async (coords) => {
     setForm((c) => ({ ...c, coordinates: coords }));
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}&zoom=18&addressdetails=1`);
@@ -37,7 +37,7 @@ const ComplaintForm = ({ onCreated, disabled }) => {
     } catch (error) {
       console.error('Error fetching address:', error);
     }
-  };
+  }, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
