@@ -29,10 +29,13 @@ const ComplaintForm = ({ onCreated, disabled }) => {
   const handleLocationSelect = useCallback(async (coords) => {
     setForm((c) => ({ ...c, coordinates: coords }));
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}&zoom=18&addressdetails=1`);
+      const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.lat}&longitude=${coords.lng}&localityLanguage=en`);
       const data = await response.json();
-      if (data && data.display_name) {
-        setForm((c) => ({ ...c, location: data.display_name }));
+      if (data) {
+        const addressParts = [data.locality, data.city, data.principalSubdivision].filter(Boolean);
+        if (addressParts.length > 0) {
+          setForm((c) => ({ ...c, location: addressParts.join(', ') }));
+        }
       }
     } catch (error) {
       console.error('Error fetching address:', error);
