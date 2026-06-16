@@ -26,6 +26,19 @@ const ComplaintForm = ({ onCreated, disabled }) => {
     return Object.keys(nextErrors).length === 0;
   };
 
+  const handleLocationSelect = async (coords) => {
+    setForm((c) => ({ ...c, coordinates: coords }));
+    try {
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}&zoom=18&addressdetails=1`);
+      const data = await response.json();
+      if (data && data.display_name) {
+        setForm((c) => ({ ...c, location: data.display_name }));
+      }
+    } catch (error) {
+      console.error('Error fetching address:', error);
+    }
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
@@ -84,7 +97,7 @@ const ComplaintForm = ({ onCreated, disabled }) => {
 
         <div className="text-sm text-slate-300">
           <label className="block mb-2">Pinpoint Exact Location</label>
-          <LocationPicker onLocationSelect={(coords) => setForm(c => ({ ...c, coordinates: coords }))} />
+          <LocationPicker onLocationSelect={handleLocationSelect} />
           <AnimatePresence>{errors.coordinates && <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="mt-2 block text-xs text-red-400">{errors.coordinates}</motion.span>}</AnimatePresence>
         </div>
 
