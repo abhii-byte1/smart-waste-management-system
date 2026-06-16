@@ -17,7 +17,11 @@ export const createComplaint = asyncHandler(async (req, res) => {
     throw new Error('Uploaded image format is not supported.');
   }
 
+  // Generate a random 6-digit ticket ID
+  const ticketId = Math.floor(100000 + Math.random() * 900000).toString();
+
   const complaint = await Complaint.create({
+    ticketId,
     location,
     description,
     image: image || '',

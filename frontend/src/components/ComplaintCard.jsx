@@ -12,6 +12,9 @@ const ComplaintCard = ({ complaint }) => (
     className="glow-card-green rounded-2xl bg-surface/60 p-4 backdrop-blur sm:p-5"
   >
     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+      <span className="rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-bold tracking-wider text-white sm:px-3 sm:text-xs">
+        #{complaint.ticketId || 'TKT-OLD'}
+      </span>
       <span className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold sm:px-3 sm:text-xs ${PRIORITY_STYLES[complaint.priority]}`}>
         {complaint.priority} Priority
       </span>

@@ -25,6 +25,7 @@ const AdminTable = ({ complaints, onStatusChange, onDelete, busyId }) => {
           <table className="min-w-full text-left text-sm text-slate-300">
             <thead className="border-b border-white/[0.06] bg-white/[0.02] text-xs uppercase tracking-[0.15em] text-slate-500">
               <tr>
+                <th className="px-5 py-4">Ticket ID</th>
                 <th className="px-5 py-4">Location</th>
                 <th className="px-5 py-4">Description</th>
                 <th className="px-5 py-4">Priority</th>
@@ -44,6 +45,9 @@ const AdminTable = ({ complaints, onStatusChange, onDelete, busyId }) => {
                     transition={{ duration: 0.3, delay: index * 0.03 }}
                     className="border-t border-white/[0.04] align-top transition-colors hover:bg-white/[0.02]"
                   >
+                    <td className="px-5 py-4 font-mono text-sm font-bold text-white">
+                      #{complaint.ticketId || 'TKT-OLD'}
+                    </td>
                     <td className="px-5 py-4">
                       <div className="font-medium text-white">{complaint.location}</div>
                       <div className="mt-1 text-xs text-slate-500">{complaint.reportedBy?.email || 'Anonymous'}</div>
@@ -116,6 +120,9 @@ const AdminTable = ({ complaints, onStatusChange, onDelete, busyId }) => {
               className="rounded-2xl border border-white/[0.06] bg-surface/50 p-4 backdrop-blur"
             >
               <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-bold text-white tracking-wider">
+                  #{complaint.ticketId || 'TKT-OLD'}
+                </span>
                 <span className={`rounded-lg px-2.5 py-1 text-[11px] font-semibold ${PRIORITY_STYLES[complaint.priority]}`}>
                   {complaint.priority}
                 </span>

@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 
 const complaintSchema = new mongoose.Schema(
   {
+    ticketId: {
+      type: String,
+      required: true,
+      unique: true
+    },
     location: {
       type: String,
       required: [true, 'Location is required.'],

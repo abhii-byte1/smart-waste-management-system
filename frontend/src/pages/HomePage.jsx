@@ -23,7 +23,7 @@ const HomePage = () => {
         <motion.div variants={slideInLeft} initial="hidden" animate="visible">
           <p className="text-xs uppercase tracking-[0.3em] text-brand-400 sm:text-sm">Clean cities, faster action</p>
           <h1 className="mt-3 max-w-3xl text-2xl font-bold leading-tight text-white xs:text-3xl sm:mt-4 sm:text-4xl lg:text-5xl">
-            Report waste complaints, prioritize them with AI, and track progress.
+            Submit waste issue tickets, prioritize them with AI, and track progress.
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-400 sm:mt-5 sm:text-base">
             Citizens can report overflowing bins, dangerous waste, and sanitation issues. Authorities get a focused
@@ -108,8 +108,8 @@ const HomePage = () => {
         <motion.div className="space-y-4 sm:space-y-5" variants={slideInRight} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold text-white sm:text-2xl">Complaint Tracking</h2>
-              <p className="mt-1.5 text-sm text-slate-400 sm:mt-2">View your submitted complaints and monitor live status updates.</p>
+              <h2 className="text-xl font-semibold text-white sm:text-2xl">Ticket Tracking</h2>
+              <p className="mt-1.5 text-sm text-slate-400 sm:mt-2">View your submitted tickets and monitor live status updates.</p>
             </div>
             {user && user.role !== 'admin' && (
               <motion.button
@@ -131,7 +131,7 @@ const HomePage = () => {
                 Complaint tracking is available for citizens only.
               </div>
             ) : (
-              loading ? <Loader text="Loading your complaints..." /> : <ComplaintList complaints={complaints} />
+              loading ? <Loader text="Loading your tickets..." /> : <ComplaintList complaints={complaints} />
             )
           )}
         </motion.div>
