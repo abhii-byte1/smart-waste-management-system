@@ -4,8 +4,10 @@ import toast from 'react-hot-toast';
 import api from '../api/client.js';
 import { buttonTap, fadeInUp } from '../utils/motion.js';
 
+import LocationPicker from './LocationPicker.jsx';
+
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
-const initialState = { location: '', description: '', image: '' };
+const initialState = { location: '', description: '', image: '', coordinates: null };
 
 const ComplaintForm = ({ onCreated, disabled }) => {
   const [form, setForm] = useState(initialState);
@@ -15,7 +17,8 @@ const ComplaintForm = ({ onCreated, disabled }) => {
 
   const validate = () => {
     const nextErrors = {};
-    if (!form.location.trim()) nextErrors.location = 'Location is required.';
+    if (!form.location.trim()) nextErrors.location = 'Location description is required.';
+    if (!form.coordinates) nextErrors.coordinates = 'Please drop a pin on the map.';
     if (!form.description.trim()) nextErrors.description = 'Description is required.';
     if (form.image && !/^data:image\//i.test(form.image) && !/^https?:\/\//i.test(form.image))
       nextErrors.image = 'Image must be uploaded from your device or be a valid image URL.';
@@ -74,10 +77,16 @@ const ComplaintForm = ({ onCreated, disabled }) => {
 
       <div className="mt-5 grid gap-4 sm:mt-6 sm:gap-5">
         <label className="text-sm text-slate-300">
-          Location
+          Location Details
           <input name="location" value={form.location} onChange={handleChange} placeholder="Ex: Near City Hospital, Sector 5" className={inputClassName} disabled={disabled || submitting} />
           <AnimatePresence>{errors.location && <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="mt-1 block text-xs text-red-400">{errors.location}</motion.span>}</AnimatePresence>
         </label>
+
+        <div className="text-sm text-slate-300">
+          <label className="block mb-2">Pinpoint Exact Location</label>
+          <LocationPicker onLocationSelect={(coords) => setForm(c => ({ ...c, coordinates: coords }))} />
+          <AnimatePresence>{errors.coordinates && <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="mt-2 block text-xs text-red-400">{errors.coordinates}</motion.span>}</AnimatePresence>
+        </div>
 
         <label className="text-sm text-slate-300">
           Description
@@ -110,7 +119,7 @@ const ComplaintForm = ({ onCreated, disabled }) => {
         <motion.button type="submit" disabled={disabled || submitting} whileHover={{ scale: 1.03 }} whileTap={buttonTap} className="w-full rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
           {submitting ? 'Submitting...' : 'Submit Ticket'}
         </motion.button>
-        <p className="text-center text-xs text-slate-500 sm:text-left">Map picker ready for future Google Maps integration.</p>
+        <p className="text-center text-xs text-slate-500 sm:text-left">Map powered by OpenStreetMap.</p>
       </div>
     </motion.form>
   );

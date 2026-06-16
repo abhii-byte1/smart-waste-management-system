@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { AlertTriangle, ClipboardList, RefreshCcw, TrendingUp } from 'lucide-react';
+import { AlertTriangle, ClipboardList, RefreshCcw, TrendingUp, Map as MapIcon, Table as TableIcon } from 'lucide-react';
 import api from '../api/client.js';
 import AdminTable from '../components/AdminTable.jsx';
+import AdminMap from '../components/AdminMap.jsx';
 import Loader from '../components/Loader.jsx';
 import StatCard from '../components/StatCard.jsx';
 import useComplaints from '../hooks/useComplaints.js';
@@ -12,6 +13,7 @@ import { buttonTap, fadeInUp, staggerContainer } from '../utils/motion.js';
 
 const DashboardPage = () => {
   const [selectedPriority, setSelectedPriority] = useState('All');
+  const [viewMode, setViewMode] = useState('table'); // 'table' or 'map'
   const [busyId, setBusyId] = useState('');
   const { complaints, loading, refetch } = useComplaints({ priority: selectedPriority });
 
@@ -68,6 +70,21 @@ const DashboardPage = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <div className="flex bg-ink rounded-xl border border-white/10 overflow-hidden">
+              <button
+                onClick={() => setViewMode('table')}
+                className={`flex items-center gap-2 px-4 py-2.5 text-sm transition ${viewMode === 'table' ? 'bg-brand-500 text-white font-medium' : 'text-slate-400 hover:text-white'}`}
+              >
+                <TableIcon className="w-4 h-4" /> Table
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={`flex items-center gap-2 px-4 py-2.5 text-sm transition ${viewMode === 'map' ? 'bg-brand-500 text-white font-medium' : 'text-slate-400 hover:text-white'}`}
+              >
+                <MapIcon className="w-4 h-4" /> Map
+              </button>
+            </div>
+
             <select
               value={selectedPriority}
               onChange={(event) => setSelectedPriority(event.target.value)}
@@ -106,7 +123,17 @@ const DashboardPage = () => {
         </motion.div>
       </motion.section>
 
-      <section>{loading ? <Loader text="Loading dashboard..." /> : <AdminTable complaints={complaints} onStatusChange={handleStatusChange} onDelete={handleDelete} busyId={busyId} />}</section>
+      <section>
+        {loading ? (
+          <Loader text="Loading dashboard..." />
+        ) : viewMode === 'map' ? (
+          <motion.div variants={fadeInUp} initial="hidden" animate="visible">
+            <AdminMap complaints={complaints} />
+          </motion.div>
+        ) : (
+          <AdminTable complaints={complaints} onStatusChange={handleStatusChange} onDelete={handleDelete} busyId={busyId} />
+        )}
+      </section>
     </div>
   );
 };

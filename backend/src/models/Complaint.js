@@ -11,6 +11,10 @@ const complaintSchema = new mongoose.Schema(
       required: [true, 'Location is required.'],
       trim: true
     },
+    coordinates: {
+      lat: Number,
+      lng: Number
+    },
     description: {
       type: String,
       required: [true, 'Description is required.'],

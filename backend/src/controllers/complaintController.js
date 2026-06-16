@@ -5,7 +5,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 const allowedStatuses = ['Pending', 'In Progress', 'Resolved'];
 
 export const createComplaint = asyncHandler(async (req, res) => {
-  const { location, description, image } = req.body;
+  const { location, coordinates, description, image } = req.body;
 
   if (!location || !description) {
     res.status(400);
@@ -23,6 +23,7 @@ export const createComplaint = asyncHandler(async (req, res) => {
   const complaint = await Complaint.create({
     ticketId,
     location,
+    coordinates,
     description,
     image: image || '',
     priority: classifyPriority(description, location),
