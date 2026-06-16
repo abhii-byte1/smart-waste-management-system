@@ -4,8 +4,7 @@ const complaintSchema = new mongoose.Schema(
   {
     ticketId: {
       type: String,
-      required: true,
-      unique: true
+      required: true
     },
     location: {
       type: String,

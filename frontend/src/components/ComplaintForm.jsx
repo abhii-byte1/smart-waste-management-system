@@ -46,9 +46,9 @@ const ComplaintForm = ({ onCreated, disabled }) => {
     setSubmitting(true);
     try {
       const { data } = await api.post('/complaints', form);
-      toast.success(`Complaint submitted with ${data.priority.toLowerCase()} priority.`);
+      toast.success(`Ticket submitted with ${data.priority.toLowerCase()} priority.`);
       setForm(initialState); setErrors({}); setFileName(''); onCreated?.();
-    } catch (error) { toast.error(error.response?.data?.message || 'Unable to submit complaint.'); }
+    } catch (error) { toast.error(error.response?.data?.message || 'Unable to submit ticket.'); }
     finally { setSubmitting(false); }
   };
 
@@ -64,8 +64,8 @@ const ComplaintForm = ({ onCreated, disabled }) => {
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-white sm:text-xl">Report a Waste Issue</h2>
-          <p className="mt-1.5 text-sm text-slate-400 sm:mt-2">Submit a complaint with location details. The backend will auto-classify urgency.</p>
+          <h2 className="text-lg font-semibold text-white sm:text-xl">Open a Support Ticket</h2>
+          <p className="mt-1.5 text-sm text-slate-400 sm:mt-2">Submit a ticket with location details. The backend will auto-classify urgency.</p>
         </div>
         <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }} className="w-fit rounded-lg bg-brand-500/15 px-3 py-1 text-xs font-medium text-brand-400 ring-1 ring-brand-500/30">
           AI Prioritization
@@ -108,7 +108,7 @@ const ComplaintForm = ({ onCreated, disabled }) => {
 
       <div className="mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center">
         <motion.button type="submit" disabled={disabled || submitting} whileHover={{ scale: 1.03 }} whileTap={buttonTap} className="w-full rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
-          {submitting ? 'Submitting...' : 'Submit Complaint'}
+          {submitting ? 'Submitting...' : 'Submit Ticket'}
         </motion.button>
         <p className="text-center text-xs text-slate-500 sm:text-left">Map picker ready for future Google Maps integration.</p>
       </div>
