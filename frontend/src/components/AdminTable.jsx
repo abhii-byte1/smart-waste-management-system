@@ -49,7 +49,12 @@ const AdminTable = ({ complaints, onStatusChange, onDelete, busyId }) => {
                       <div className="mt-1 text-xs text-slate-500">{complaint.reportedBy?.email || 'Anonymous'}</div>
                     </td>
                     <td className="max-w-[220px] px-5 py-4 text-slate-400">
-                      <p className="line-clamp-2">{complaint.description}</p>
+                      <div className="flex items-start gap-3">
+                        {complaint.image && (
+                          <img src={complaint.image} alt="Issue" className="h-12 w-12 shrink-0 rounded-lg object-cover border border-white/10" />
+                        )}
+                        <p className="line-clamp-2 flex-1">{complaint.description}</p>
+                      </div>
                     </td>
                     <td className="px-5 py-4">
                       <span className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${PRIORITY_STYLES[complaint.priority]}`}>
@@ -120,7 +125,10 @@ const AdminTable = ({ complaints, onStatusChange, onDelete, busyId }) => {
               </div>
               <h3 className="mt-3 text-sm font-medium text-white">{complaint.location}</h3>
               <p className="mt-1 text-xs text-slate-500">{complaint.reportedBy?.email || 'Anonymous'}</p>
-              <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-400">{complaint.description}</p>
+              {complaint.image && (
+                <img src={complaint.image} alt="Issue" className="mt-3 h-32 w-full rounded-xl object-cover border border-white/10" />
+              )}
+              <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-slate-400">{complaint.description}</p>
               <p className="mt-3 text-xs text-slate-500">{formatDateTime(complaint.createdAt)}</p>
               <div className="mt-3 flex items-center gap-2 border-t border-white/[0.06] pt-3">
                 <select
