@@ -58,7 +58,7 @@ const LocationPicker = ({ onLocationSelect }) => {
   return (
     <div className="h-64 w-full overflow-hidden rounded-xl border border-white/10 sm:h-80 relative z-0">
       <MapContainer 
-        center={defaultCenter} 
+        center={center} 
         zoom={13} 
         scrollWheelZoom={true} 
         style={{ height: '100%', width: '100%', zIndex: 0 }}
