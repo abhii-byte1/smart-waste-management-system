@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -23,15 +23,35 @@ const LocationMarker = ({ position, setPosition }) => {
   );
 };
 
+const MapUpdater = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo(center, 14);
+  }, [center, map]);
+  return null;
+};
+
 const LocationPicker = ({ onLocationSelect }) => {
   const [position, setPosition] = useState(null);
+  const [center, setCenter] = useState([40.7128, -74.0060]); // Default NYC
 
-  // Default to a central city location, or allow geolocation
-  const defaultCenter = [40.7128, -74.0060]; // Example: NYC, change as needed
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coords = [pos.coords.latitude, pos.coords.longitude];
+          setCenter(coords);
+          setPosition(coords); // Automatically drop pin at their location
+        },
+        (err) => console.log('Geolocation error:', err.message),
+        { enableHighAccuracy: true }
+      );
+    }
+  }, []);
 
   useEffect(() => {
     if (position) {
-      onLocationSelect(position);
+      onLocationSelect({ lat: position[0] ?? position.lat, lng: position[1] ?? position.lng });
     }
   }, [position, onLocationSelect]);
 
@@ -49,6 +69,7 @@ const LocationPicker = ({ onLocationSelect }) => {
           className="map-tiles"
         />
         <LocationMarker position={position} setPosition={setPosition} />
+        <MapUpdater center={center} />
       </MapContainer>
       <style>{`
         /* Dark mode map tiles filter */
