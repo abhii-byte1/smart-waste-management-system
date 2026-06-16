@@ -1,20 +1,23 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { AlertTriangle, ClipboardList, RefreshCcw, TrendingUp, Map as MapIcon, Table as TableIcon } from 'lucide-react';
+import { AlertTriangle, ClipboardList, RefreshCcw, TrendingUp, Map as MapIcon, Table as TableIcon, BarChart2, Download } from 'lucide-react';
 import api from '../api/client.js';
 import AdminTable from '../components/AdminTable.jsx';
 import AdminMap from '../components/AdminMap.jsx';
+import AnalyticsDashboard from '../components/AnalyticsDashboard.jsx';
 import Loader from '../components/Loader.jsx';
 import StatCard from '../components/StatCard.jsx';
 import useComplaints from '../hooks/useComplaints.js';
 import { PRIORITY_OPTIONS } from '../utils/constants.js';
+import { exportToCSV, exportToPDF } from '../utils/exportUtils.js';
 import { buttonTap, fadeInUp, staggerContainer } from '../utils/motion.js';
 
 const DashboardPage = () => {
   const [selectedPriority, setSelectedPriority] = useState('All');
-  const [viewMode, setViewMode] = useState('table'); // 'table' or 'map'
+  const [viewMode, setViewMode] = useState('table'); // 'table', 'map', or 'analytics'
   const [busyId, setBusyId] = useState('');
+  const [showExportMenu, setShowExportMenu] = useState(false);
   const { complaints, loading, refetch } = useComplaints({ priority: selectedPriority });
 
   const stats = useMemo(
@@ -79,9 +82,15 @@ const DashboardPage = () => {
               </button>
               <button
                 onClick={() => setViewMode('map')}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm transition ${viewMode === 'map' ? 'bg-brand-500 text-white font-medium' : 'text-slate-400 hover:text-white'}`}
+                className={`flex items-center gap-2 px-4 py-2.5 text-sm transition border-l border-white/5 ${viewMode === 'map' ? 'bg-brand-500 text-white font-medium' : 'text-slate-400 hover:text-white'}`}
               >
                 <MapIcon className="w-4 h-4" /> Map
+              </button>
+              <button
+                onClick={() => setViewMode('analytics')}
+                className={`flex items-center gap-2 px-4 py-2.5 text-sm transition border-l border-white/5 ${viewMode === 'analytics' ? 'bg-brand-500 text-white font-medium' : 'text-slate-400 hover:text-white'}`}
+              >
+                <BarChart2 className="w-4 h-4" /> Analytics
               </button>
             </div>
 
@@ -96,6 +105,30 @@ const DashboardPage = () => {
                 </option>
               ))}
             </select>
+
+            <div className="relative">
+              <motion.button
+                type="button"
+                onClick={() => setShowExportMenu(!showExportMenu)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={buttonTap}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition hover:bg-white/10 sm:py-3"
+              >
+                <Download className="h-4 w-4" />
+                Export
+              </motion.button>
+              
+              {showExportMenu && (
+                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-white/10 bg-slate-800 shadow-xl z-50 overflow-hidden">
+                  <button onClick={() => { exportToPDF(complaints); setShowExportMenu(false); }} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition">
+                    📄 Export as PDF
+                  </button>
+                  <button onClick={() => { exportToCSV(complaints); setShowExportMenu(false); }} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition border-t border-white/5">
+                    📊 Export as CSV
+                  </button>
+                </div>
+              )}
+            </div>
 
             <motion.button
               type="button"
@@ -129,6 +162,10 @@ const DashboardPage = () => {
         ) : viewMode === 'map' ? (
           <motion.div variants={fadeInUp} initial="hidden" animate="visible">
             <AdminMap complaints={complaints} />
+          </motion.div>
+        ) : viewMode === 'analytics' ? (
+          <motion.div variants={fadeInUp} initial="hidden" animate="visible">
+            <AnalyticsDashboard complaints={complaints} />
           </motion.div>
         ) : (
           <AdminTable complaints={complaints} onStatusChange={handleStatusChange} onDelete={handleDelete} busyId={busyId} />
