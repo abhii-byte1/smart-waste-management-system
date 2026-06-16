@@ -91,6 +91,43 @@ const AboutPage = () => {
           </div>
         </div>
       </motion.section>
+    <motion.section
+        variants={fadeInUp}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="overflow-hidden rounded-3xl border border-brand-500/30 bg-surface/50 backdrop-blur glow-card-green"
+      >
+        <div className="p-8 sm:p-12">
+          <h2 className="text-2xl font-bold text-white sm:text-3xl">Founder & Lead Developer</h2>
+          <div className="mt-8 flex flex-col md:flex-row gap-8 items-start">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-brand-500/20 font-bold text-brand-400 ring-1 ring-brand-500/30 text-3xl uppercase">
+              AM
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">Abhishek Meena</h3>
+              <p className="mt-1 text-sm font-medium text-brand-400">B.Tech in Artificial Intelligence & Machine Learning</p>
+              <p className="mt-4 text-base leading-relaxed text-slate-400">
+                Passionate about building innovative technology solutions that solve real-world civic and social challenges through AI and web development.
+              </p>
+              
+              <div className="mt-6">
+                <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-300">Tech Stack</h4>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {['HTML', 'CSS', 'JavaScript', 'Node.js', 'Express.js', 'MongoDB Atlas', 'Render'].map(tech => (
+                    <span key={tech} className="rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-sm text-slate-300">
+                      {tech}
+                    </span>
+                  ))}
+                  <span className="rounded-lg bg-brand-500/20 border border-brand-500/30 px-3 py-1.5 text-sm text-brand-400">
+                    🚀♻️
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
     </div>
   );
 };
