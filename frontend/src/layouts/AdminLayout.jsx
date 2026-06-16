@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { BarChart3, LogOut, Menu, ShieldCheck, Trash2, X } from 'lucide-react';
+import { BarChart3, LogOut, Mail, Menu, MessageSquare, ShieldCheck, Trash2, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { pageTransition } from '../utils/motion.js';
 
@@ -51,6 +51,8 @@ const AdminLayout = () => {
 
         <nav className="flex flex-1 flex-col items-center gap-1.5 px-2 py-4">
           <SidebarLink to="/admin/dashboard" icon={BarChart3} label="Dashboard" />
+          <SidebarLink to="/admin/messages" icon={Mail} label="Messages" />
+          <SidebarLink to="/admin/feedback" icon={MessageSquare} label="Feedback" />
         </nav>
 
         <div className="border-t border-white/[0.06] px-2 py-3">
@@ -102,6 +104,24 @@ const AdminLayout = () => {
                   }
                 >
                   <BarChart3 className="h-5 w-5" /> Admin Dashboard
+                </NavLink>
+                <NavLink
+                  to="/admin/messages"
+                  onClick={() => setSidebarOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition ${isActive ? 'bg-brand-500/15 text-brand-400' : 'text-slate-300 hover:bg-white/5'}`
+                  }
+                >
+                  <Mail className="h-5 w-5" /> Messages
+                </NavLink>
+                <NavLink
+                  to="/admin/feedback"
+                  onClick={() => setSidebarOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition ${isActive ? 'bg-brand-500/15 text-brand-400' : 'text-slate-300 hover:bg-white/5'}`
+                  }
+                >
+                  <MessageSquare className="h-5 w-5" /> Feedback
                 </NavLink>
                 <div className="my-3 border-t border-white/[0.06]" />
                 <div className="flex items-center gap-3 rounded-xl bg-white/[0.03] px-4 py-3 text-sm text-slate-300">

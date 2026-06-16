@@ -4,6 +4,8 @@ import CitizenLayout from './layouts/CitizenLayout.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
+import AdminMessagesPage from './pages/AdminMessagesPage.jsx';
+import AdminFeedbackPage from './pages/AdminFeedbackPage.jsx';
 import FeedbackPage from './pages/FeedbackPage.jsx';
 import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
@@ -53,6 +55,22 @@ const App = () => (
         element={
           <ProtectedRoute requireAdmin>
             <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="messages"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminMessagesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="feedback"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminFeedbackPage />
           </ProtectedRoute>
         }
       />

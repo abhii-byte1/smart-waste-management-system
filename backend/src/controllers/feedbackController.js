@@ -17,3 +17,14 @@ export const submitFeedback = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getFeedbacks = async (req, res) => {
+  try {
+    const type = req.query.type;
+    const filter = type ? { type } : {};
+    const feedbacks = await Feedback.find(filter).sort({ createdAt: -1 });
+    res.json(feedbacks);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
