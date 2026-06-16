@@ -47,8 +47,8 @@ const AdminMap = ({ complaints }) => {
           style={{ height: '100%', width: '100%', zIndex: 0 }}
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.esri.com/">Esri</a>, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
             className="map-tiles"
           />
           {validComplaints.map((complaint) => (
@@ -79,10 +79,6 @@ const AdminMap = ({ complaints }) => {
           ))}
         </MapContainer>
         <style>{`
-          /* Dark mode map tiles filter */
-          .map-tiles {
-            filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
-          }
           .leaflet-container {
             background-color: #0f172a;
           }
