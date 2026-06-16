@@ -21,7 +21,6 @@ const RegisterPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     try {
       const user = await register(form);
       navigate(user.role === 'admin' ? '/dashboard' : '/');
@@ -31,7 +30,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <section className="flex min-h-[60vh] items-center justify-center px-4 sm:min-h-[75vh]">
+    <section className="flex min-h-[60vh] items-center justify-center px-4 sm:min-h-[70vh]">
       <AuthForm
         title="Create Account"
         subtitle="Start reporting waste issues in your area with real-time tracking."

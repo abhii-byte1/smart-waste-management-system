@@ -20,7 +20,6 @@ const LoginPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     try {
       const user = await login(form);
       navigate(user.role === 'admin' ? '/dashboard' : '/');
@@ -30,7 +29,7 @@ const LoginPage = () => {
   };
 
   return (
-    <section className="flex min-h-[60vh] items-center justify-center px-4 sm:min-h-[75vh]">
+    <section className="flex min-h-[60vh] items-center justify-center px-4 sm:min-h-[70vh]">
       <AuthForm
         title="Welcome Back"
         subtitle="Log in as a citizen or admin to continue managing complaints."

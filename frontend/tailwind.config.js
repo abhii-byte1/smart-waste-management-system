@@ -16,12 +16,24 @@ export default {
           800: '#095a3e',
           900: '#06402d'
         },
-        ink: '#06131c'
+        ink: '#06131c',
+        surface: '#0a1a24',
+        'surface-light': '#0f2430',
+        neon: {
+          green: '#14b87a',
+          red: '#ef4444',
+          cyan: '#22d3ee',
+          amber: '#f59e0b'
+        }
       },
       boxShadow: {
         glow: '0 20px 60px rgba(20, 184, 122, 0.16)',
         'glow-lg': '0 30px 80px rgba(20, 184, 122, 0.22)',
-        'glow-sm': '0 8px 30px rgba(20, 184, 122, 0.12)'
+        'glow-sm': '0 8px 30px rgba(20, 184, 122, 0.12)',
+        'neon-green': '0 0 20px rgba(20, 184, 122, 0.4), 0 0 40px rgba(20, 184, 122, 0.15)',
+        'neon-red': '0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.15)',
+        'neon-cyan': '0 0 20px rgba(34, 211, 238, 0.4), 0 0 40px rgba(34, 211, 238, 0.15)',
+        'neon-amber': '0 0 20px rgba(245, 158, 11, 0.4), 0 0 40px rgba(245, 158, 11, 0.15)'
       },
       backgroundImage: {
         'hero-grid':
@@ -31,7 +43,7 @@ export default {
         'hero-grid': 'auto, 44px 44px, 44px 44px'
       },
       screens: {
-        'xs': '475px'
+        xs: '475px'
       }
     }
   },

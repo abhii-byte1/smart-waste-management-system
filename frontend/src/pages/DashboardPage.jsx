@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { RefreshCcw } from 'lucide-react';
+import { AlertTriangle, ClipboardList, RefreshCcw, TrendingUp } from 'lucide-react';
 import api from '../api/client.js';
 import AdminTable from '../components/AdminTable.jsx';
 import Loader from '../components/Loader.jsx';
@@ -56,13 +56,13 @@ const DashboardPage = () => {
         variants={fadeInUp}
         initial="hidden"
         animate="visible"
-        className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur sm:rounded-[2rem] sm:p-8"
+        className="rounded-2xl border border-white/[0.06] bg-surface/50 p-5 backdrop-blur sm:rounded-3xl sm:p-8"
       >
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-brand-200 sm:text-sm sm:tracking-[0.35em]">Admin Command Center</p>
-            <h1 className="mt-2 text-2xl font-semibold text-white sm:mt-3 sm:text-3xl lg:text-4xl">Waste complaint operations dashboard</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:mt-3">
+            <p className="text-xs uppercase tracking-[0.3em] text-brand-400 sm:text-sm">Admin Command Center</p>
+            <h1 className="mt-2 text-2xl font-bold text-white sm:mt-3 sm:text-3xl lg:text-4xl">Waste complaint operations dashboard</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400 sm:mt-3">
               Review incoming complaints, filter by priority, update progress, and remove stale reports when needed.
             </p>
           </div>
@@ -71,7 +71,7 @@ const DashboardPage = () => {
             <select
               value={selectedPriority}
               onChange={(event) => setSelectedPriority(event.target.value)}
-              className="rounded-full border border-white/10 bg-slate-950/80 px-4 py-2.5 text-sm text-white sm:py-3"
+              className="rounded-xl border border-white/10 bg-ink px-4 py-2.5 text-sm text-white sm:py-3"
             >
               {PRIORITY_OPTIONS.map((option) => (
                 <option key={option} value={option}>
@@ -86,7 +86,7 @@ const DashboardPage = () => {
               whileHover={{ scale: 1.05, rotate: 90 }}
               whileTap={buttonTap}
               transition={{ duration: 0.3 }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition hover:bg-white/10 sm:py-3"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition hover:bg-white/10 sm:py-3"
             >
               <RefreshCcw className="h-4 w-4" />
               Refresh
@@ -100,9 +100,9 @@ const DashboardPage = () => {
           initial="hidden"
           animate="visible"
         >
-          <StatCard label="Total Complaints" value={stats.total} accent="text-slate-100" />
-          <StatCard label="High Priority" value={stats.high} accent="text-red-300" />
-          <StatCard label="Open Cases" value={stats.active} accent="text-amber-300" />
+          <StatCard label="Total Complaints" value={stats.total} subtitle="+15% this month" icon={TrendingUp} glowColor="green" />
+          <StatCard label="High Priority" value={stats.high} subtitle="Urgency" icon={AlertTriangle} glowColor="red" />
+          <StatCard label="Open Cases" value={stats.active} subtitle="Active assignments" icon={ClipboardList} glowColor="cyan" />
         </motion.div>
       </motion.section>
 

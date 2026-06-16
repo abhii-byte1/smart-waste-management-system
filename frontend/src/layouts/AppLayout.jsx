@@ -1,170 +1,240 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, ShieldCheck, Trash2, X } from 'lucide-react';
+import { BarChart3, Home, LogOut, Menu, ShieldCheck, Trash2, User, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { pageTransition } from '../utils/motion.js';
 
-const navLinkClass = ({ isActive }) =>
-  `rounded-full px-4 py-2 text-sm transition-all duration-200 ${isActive ? 'bg-white/10 text-white shadow-sm' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`;
-
-const mobileNavLinkClass = ({ isActive }) =>
-  `block rounded-2xl px-4 py-3 text-base transition-all duration-200 ${isActive ? 'bg-white/10 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white'}`;
+const SidebarLink = ({ to, icon: Icon, label, onClick }) => (
+  <NavLink
+    to={to}
+    onClick={onClick}
+    className={({ isActive }) =>
+      `group flex flex-col items-center gap-1 rounded-2xl px-3 py-3 text-[11px] font-medium transition-all duration-200 ${
+        isActive
+          ? 'bg-brand-500/15 text-brand-400'
+          : 'text-slate-500 hover:bg-white/5 hover:text-slate-300'
+      }`
+    }
+  >
+    <Icon className="h-5 w-5" />
+    <span>{label}</span>
+  </NavLink>
+);
 
 const AppLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
-    setMobileMenuOpen(false);
+    setSidebarOpen(false);
     navigate('/');
   };
 
-  const closeMobileMenu = () => setMobileMenuOpen(false);
-
   return (
-    <div className="min-h-screen">
-      <motion.header
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="sticky top-0 z-30 border-b border-white/10 bg-ink/80 backdrop-blur-xl"
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
-          <Link to="/" className="flex items-center gap-2.5 text-white sm:gap-3" onClick={closeMobileMenu}>
+    <div className="flex min-h-screen">
+      {/* ═══ Desktop Sidebar ═══ */}
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[80px] flex-col border-r border-white/[0.06] bg-ink/90 backdrop-blur-xl md:flex">
+        <div className="flex h-16 items-center justify-center border-b border-white/[0.06]">
+          <Link to="/">
             <motion.div
-              whileHover={{ rotate: [0, -10, 10, 0], transition: { duration: 0.5 } }}
-              className="rounded-xl bg-brand-500/15 p-2 ring-1 ring-brand-500/30 sm:rounded-2xl sm:p-3"
+              whileHover={{ rotate: [0, -8, 8, 0], transition: { duration: 0.5 } }}
+              className="rounded-xl bg-brand-500/15 p-2.5 ring-1 ring-brand-500/30"
             >
-              <Trash2 className="h-4 w-4 text-brand-200 sm:h-5 sm:w-5" />
+              <Trash2 className="h-5 w-5 text-brand-400" />
             </motion.div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-brand-200 sm:text-sm sm:tracking-[0.25em]">Smart Waste</p>
-              <p className="text-sm font-semibold sm:text-lg">Management Platform</p>
-            </div>
           </Link>
-
-          {/* Desktop navigation */}
-          <nav className="hidden items-center gap-2 md:flex">
-            <NavLink to="/" className={navLinkClass}>
-              Home
-            </NavLink>
-            {user?.role === 'admin' && (
-              <NavLink to="/dashboard" className={navLinkClass}>
-                Admin Dashboard
-              </NavLink>
-            )}
-          </nav>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            {user ? (
-              <>
-                <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-200 sm:flex sm:px-4 sm:py-2 sm:text-sm">
-                  <ShieldCheck className="h-3.5 w-3.5 text-brand-300 sm:h-4 sm:w-4" />
-                  <span className="hidden lg:inline">{user.name}</span> ({user.role})
-                </div>
-                <motion.button
-                  type="button"
-                  onClick={handleLogout}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="hidden rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition hover:bg-white/10 md:block"
-                >
-                  Logout
-                </motion.button>
-              </>
-            ) : (
-              <div className="hidden items-center gap-2 md:flex">
-                <Link to="/login" className="rounded-full px-4 py-2 text-sm text-slate-200 transition-colors hover:text-white">
-                  Login
-                </Link>
-                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                  <Link to="/register" className="rounded-full bg-brand-500 px-4 py-2 text-sm font-medium text-white">
-                    Register
-                  </Link>
-                </motion.div>
-              </div>
-            )}
-
-            {/* Mobile menu button */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="rounded-xl border border-white/10 bg-white/5 p-2 text-white transition hover:bg-white/10 md:hidden"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
         </div>
 
-        {/* Mobile menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: 'easeInOut' }}
-              className="overflow-hidden border-t border-white/10 md:hidden"
+        <nav className="flex flex-1 flex-col items-center gap-1.5 px-2 py-4">
+          <SidebarLink to="/" icon={Home} label="Home" />
+          {user?.role === 'admin' && (
+            <SidebarLink to="/dashboard" icon={BarChart3} label="Admin" />
+          )}
+        </nav>
+
+        <div className="border-t border-white/[0.06] px-2 py-3">
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="flex w-full flex-col items-center gap-1 rounded-2xl px-3 py-3 text-[11px] font-medium text-slate-500 transition hover:bg-white/5 hover:text-red-400"
             >
-              <nav className="space-y-1 px-4 py-4">
-                <NavLink to="/" className={mobileNavLinkClass} onClick={closeMobileMenu}>
-                  Home
+              <LogOut className="h-5 w-5" />
+              <span>Logout</span>
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="flex flex-col items-center gap-1 rounded-2xl px-3 py-3 text-[11px] font-medium text-slate-500 transition hover:bg-white/5 hover:text-slate-300"
+            >
+              <User className="h-5 w-5" />
+              <span>Login</span>
+            </Link>
+          )}
+        </div>
+      </aside>
+
+      {/* ═══ Mobile Sidebar Overlay ═══ */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSidebarOpen(false)}
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+            />
+            <motion.aside
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed left-0 top-0 z-50 h-screen w-[260px] border-r border-white/[0.06] bg-ink/95 backdrop-blur-xl md:hidden"
+            >
+              <div className="flex h-16 items-center justify-between border-b border-white/[0.06] px-5">
+                <Link to="/" onClick={() => setSidebarOpen(false)} className="flex items-center gap-2.5">
+                  <div className="rounded-xl bg-brand-500/15 p-2 ring-1 ring-brand-500/30">
+                    <Trash2 className="h-4 w-4 text-brand-400" />
+                  </div>
+                  <span className="text-sm font-semibold text-white">Smart Waste</span>
+                </Link>
+                <button onClick={() => setSidebarOpen(false)} className="rounded-lg p-1 text-slate-400 hover:text-white">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <nav className="space-y-1 px-3 py-4">
+                <NavLink
+                  to="/"
+                  onClick={() => setSidebarOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition ${isActive ? 'bg-brand-500/15 text-brand-400' : 'text-slate-300 hover:bg-white/5'}`
+                  }
+                >
+                  <Home className="h-5 w-5" /> Home
                 </NavLink>
                 {user?.role === 'admin' && (
-                  <NavLink to="/dashboard" className={mobileNavLinkClass} onClick={closeMobileMenu}>
-                    Admin Dashboard
+                  <NavLink
+                    to="/dashboard"
+                    onClick={() => setSidebarOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition ${isActive ? 'bg-brand-500/15 text-brand-400' : 'text-slate-300 hover:bg-white/5'}`
+                    }
+                  >
+                    <BarChart3 className="h-5 w-5" /> Admin Dashboard
                   </NavLink>
                 )}
+                <div className="my-3 border-t border-white/[0.06]" />
                 {user ? (
                   <>
-                    <div className="my-3 border-t border-white/10" />
-                    <div className="flex items-center gap-2 rounded-2xl bg-white/5 px-4 py-3 text-sm text-slate-200">
-                      <ShieldCheck className="h-4 w-4 text-brand-300" />
-                      {user.name} ({user.role})
+                    <div className="flex items-center gap-3 rounded-xl bg-white/[0.03] px-4 py-3 text-sm text-slate-300">
+                      <ShieldCheck className="h-5 w-5 text-brand-400" />
+                      <div>
+                        <p className="font-medium text-white">{user.name}</p>
+                        <p className="text-xs text-slate-400">{user.role}</p>
+                      </div>
                     </div>
                     <button
-                      type="button"
                       onClick={handleLogout}
-                      className="w-full rounded-2xl px-4 py-3 text-left text-base text-red-300 transition hover:bg-white/5"
+                      className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-red-400 hover:bg-white/5"
                     >
-                      Logout
+                      <LogOut className="h-5 w-5" /> Logout
                     </button>
                   </>
                 ) : (
                   <>
-                    <div className="my-3 border-t border-white/10" />
-                    <NavLink to="/login" className={mobileNavLinkClass} onClick={closeMobileMenu}>
-                      Login
+                    <NavLink to="/login" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-300 hover:bg-white/5">
+                      <User className="h-5 w-5" /> Login
                     </NavLink>
-                    <NavLink to="/register" className={mobileNavLinkClass} onClick={closeMobileMenu}>
-                      Register
+                    <NavLink to="/register" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-300 hover:bg-white/5">
+                      <User className="h-5 w-5" /> Register
                     </NavLink>
                   </>
                 )}
               </nav>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.header>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={location.pathname}
-            variants={pageTransition}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <Outlet />
-          </motion.div>
-        </AnimatePresence>
-      </main>
+      {/* ═══ Main Content ═══ */}
+      <div className="relative z-10 flex flex-1 flex-col md:ml-[80px]">
+        {/* Top bar */}
+        <motion.header
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-white/[0.06] bg-ink/70 px-4 backdrop-blur-xl sm:h-16 sm:px-6"
+        >
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="rounded-xl border border-white/10 bg-white/5 p-2 text-white transition hover:bg-white/10 md:hidden"
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-brand-400 sm:text-xs">Smart Waste Management</p>
+              <p className="text-sm font-semibold text-white sm:text-base">
+                {location.pathname === '/dashboard' ? 'Admin Command Center' : 'Platform'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            {user ? (
+              <div className="flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-xs text-slate-300 sm:px-4 sm:py-2 sm:text-sm">
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-500/20 text-[10px] font-bold text-brand-400 sm:h-7 sm:w-7">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:inline">{user.name}</span>
+                <span className="rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-medium text-brand-400">
+                  {user.role}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link to="/login" className="rounded-full px-3 py-1.5 text-xs text-slate-300 transition hover:text-white sm:text-sm">
+                  Login
+                </Link>
+                <Link to="/register" className="rounded-full bg-brand-500 px-3 py-1.5 text-xs font-medium text-white sm:text-sm">
+                  Register
+                </Link>
+              </div>
+            )}
+          </div>
+        </motion.header>
+
+        {/* Page content */}
+        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              variants={pageTransition}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
+
+      {/* ═══ Background Floating Particles ═══ */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="neon-particle particle-1" />
+        <div className="neon-particle particle-2" />
+        <div className="neon-particle particle-3" />
+        <div className="neon-particle particle-4" />
+        <div className="neon-line neon-line-1" />
+        <div className="neon-line neon-line-2" />
+        <div className="neon-line neon-line-3" />
+      </div>
     </div>
   );
 };
