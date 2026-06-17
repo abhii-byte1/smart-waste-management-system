@@ -1,13 +1,4 @@
 import { v2 as cloudinary } from 'cloudinary';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 /**
  * Uploads a base64 image string to Cloudinary
@@ -22,6 +13,13 @@ export const uploadImage = async (base64Image) => {
     if (base64Image.startsWith('http')) {
       return base64Image;
     }
+
+    // Configure dynamically to ensure process.env is fully loaded by server.js
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
 
     const result = await cloudinary.uploader.upload(base64Image, {
       folder: 'smart_waste_management',
