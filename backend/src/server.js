@@ -29,30 +29,33 @@ await connectDB();
 
 const app = express();
 
-// Security Middlewares
-app.use(helmet({
-  contentSecurityPolicy: false, // Disabled for Render/Cloudinary images in MVP
-}));
-app.use(mongoSanitize());
-
-// Rate Limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  message: 'Too many requests from this IP, please try again after 15 minutes',
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-});
-app.use('/api', limiter); // Apply rate limiter to API routes only
-
+// 1. CORS must be first so blocked requests still get CORS headers
 app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:5173'
   })
 );
-// We can reduce JSON limit to 50mb since we need to accept base64 from frontend before sending to Cloudinary
+
+// 2. Body Parsers must run before sanitizers
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// 3. Security Middlewares
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
+app.use(mongoSanitize());
+
+// 4. Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // Increased to 200 to prevent lockout during testing
+  message: { message: 'Too many requests from this IP, please try again after 15 minutes' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api', limiter);
+
 app.use(morgan('dev'));
 
 app.get('/api/health', (req, res) => {
