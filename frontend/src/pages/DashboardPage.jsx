@@ -6,6 +6,7 @@ import api from '../api/client.js';
 import AdminTable from '../components/AdminTable.jsx';
 import AdminMap from '../components/AdminMap.jsx';
 import AnalyticsDashboard from '../components/AnalyticsDashboard.jsx';
+import ComplaintDetailsDrawer from '../components/ComplaintDetailsDrawer.jsx';
 import Loader from '../components/Loader.jsx';
 import StatCard from '../components/StatCard.jsx';
 import useComplaints from '../hooks/useComplaints.js';
@@ -19,6 +20,7 @@ const DashboardPage = () => {
   const [busyId, setBusyId] = useState('');
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
   
   // Paginated data for the Table
   const { complaints: pagedComplaints, pagination, loading, refetch } = useComplaints({ 
@@ -47,6 +49,12 @@ const DashboardPage = () => {
     try {
       await api.put(`/complaints/${id}`, { status });
       toast.success('Status updated.');
+      
+      // Update local state for drawer if it's currently open
+      if (selectedComplaint && selectedComplaint._id === id) {
+        setSelectedComplaint(prev => ({ ...prev, status }));
+      }
+      
       refetch();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to update status.');
@@ -60,6 +68,9 @@ const DashboardPage = () => {
     try {
       await api.delete(`/complaints/${id}`);
       toast.success('Complaint deleted.');
+      if (selectedComplaint && selectedComplaint._id === id) {
+        setSelectedComplaint(null);
+      }
       refetch();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to delete complaint.');
@@ -182,7 +193,14 @@ const DashboardPage = () => {
           </motion.div>
         ) : (
           <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-            <AdminTable complaints={pagedComplaints} onStatusChange={handleStatusChange} onDelete={handleDelete} busyId={busyId} />
+            <AdminTable 
+              complaints={pagedComplaints} 
+              onStatusChange={handleStatusChange} 
+              onDelete={handleDelete} 
+              busyId={busyId} 
+              onRowClick={setSelectedComplaint}
+              selectedId={selectedComplaint?._id}
+            />
             
             {pagination && pagination.totalPages > 1 && (
               <div className="mt-6 flex items-center justify-between border-t border-white/[0.06] pt-6">
@@ -210,6 +228,14 @@ const DashboardPage = () => {
           </motion.div>
         )}
       </section>
+      
+      <ComplaintDetailsDrawer 
+        complaint={selectedComplaint} 
+        onClose={() => setSelectedComplaint(null)} 
+        onStatusChange={handleStatusChange}
+        onDelete={handleDelete}
+        busyId={busyId}
+      />
     </div>
   );
 };
