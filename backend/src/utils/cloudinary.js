@@ -34,6 +34,6 @@ export const uploadImage = async (base64Image) => {
     return result.secure_url;
   } catch (error) {
     console.error('Cloudinary upload error:', error);
-    throw new Error('Image upload failed. Please try again.');
+    throw new Error(`Cloudinary Error: ${error.message || 'Unknown configuration issue'}`);
   }
 };
