@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
 import { connectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import complaintRoutes from './routes/complaintRoutes.js';
@@ -26,13 +29,30 @@ await connectDB();
 
 const app = express();
 
+// Security Middlewares
+app.use(helmet({
+  contentSecurityPolicy: false, // Disabled for Render/Cloudinary images in MVP
+}));
+app.use(mongoSanitize());
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+app.use('/api', limiter); // Apply rate limiter to API routes only
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:5173'
   })
 );
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+// We can reduce JSON limit to 50mb since we need to accept base64 from frontend before sending to Cloudinary
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(morgan('dev'));
 
 app.get('/api/health', (req, res) => {

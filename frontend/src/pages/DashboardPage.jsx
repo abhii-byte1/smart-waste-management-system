@@ -18,15 +18,28 @@ const DashboardPage = () => {
   const [viewMode, setViewMode] = useState('table'); // 'table', 'map', or 'analytics'
   const [busyId, setBusyId] = useState('');
   const [showExportMenu, setShowExportMenu] = useState(false);
-  const { complaints, loading, refetch } = useComplaints({ priority: selectedPriority });
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Paginated data for the Table
+  const { complaints: pagedComplaints, pagination, loading, refetch } = useComplaints({ 
+    priority: selectedPriority, 
+    page: currentPage, 
+    limit: 50 
+  });
+
+  // Unpaginated data for Analytics, Maps, and Exports
+  const { complaints: allComplaints } = useComplaints({ 
+    priority: selectedPriority, 
+    noPaginate: true 
+  });
 
   const stats = useMemo(
     () => ({
-      total: complaints.length,
-      high: complaints.filter((item) => item.priority === 'High').length,
-      active: complaints.filter((item) => item.status !== 'Resolved').length
+      total: allComplaints.length,
+      high: allComplaints.filter((item) => item.priority === 'High').length,
+      active: allComplaints.filter((item) => item.status !== 'Resolved').length
     }),
-    [complaints]
+    [allComplaints]
   );
 
   const handleStatusChange = async (id, status) => {
@@ -120,10 +133,10 @@ const DashboardPage = () => {
               
               {showExportMenu && (
                 <div className="absolute right-0 mt-2 w-48 rounded-xl border border-white/10 bg-slate-800 shadow-xl z-50 overflow-hidden">
-                  <button onClick={() => { exportToPDF(complaints); setShowExportMenu(false); }} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition">
+                  <button onClick={() => { exportToPDF(allComplaints); setShowExportMenu(false); }} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition">
                     📄 Export as PDF
                   </button>
-                  <button onClick={() => { exportToCSV(complaints); setShowExportMenu(false); }} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition border-t border-white/5">
+                  <button onClick={() => { exportToCSV(allComplaints); setShowExportMenu(false); }} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition border-t border-white/5">
                     📊 Export as CSV
                   </button>
                 </div>
@@ -132,7 +145,7 @@ const DashboardPage = () => {
 
             <motion.button
               type="button"
-              onClick={refetch}
+              onClick={() => { setCurrentPage(1); refetch(); }}
               whileHover={{ scale: 1.05 }}
               whileTap={buttonTap}
               transition={{ duration: 0.3 }}
@@ -161,14 +174,40 @@ const DashboardPage = () => {
           <Loader text="Loading dashboard..." />
         ) : viewMode === 'map' ? (
           <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-            <AdminMap complaints={complaints} />
+            <AdminMap complaints={allComplaints} />
           </motion.div>
         ) : viewMode === 'analytics' ? (
           <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-            <AnalyticsDashboard complaints={complaints} />
+            <AnalyticsDashboard complaints={allComplaints} />
           </motion.div>
         ) : (
-          <AdminTable complaints={complaints} onStatusChange={handleStatusChange} onDelete={handleDelete} busyId={busyId} />
+          <motion.div variants={fadeInUp} initial="hidden" animate="visible">
+            <AdminTable complaints={pagedComplaints} onStatusChange={handleStatusChange} onDelete={handleDelete} busyId={busyId} />
+            
+            {pagination && pagination.totalPages > 1 && (
+              <div className="mt-6 flex items-center justify-between border-t border-white/[0.06] pt-6">
+                <p className="text-sm text-slate-400">
+                  Showing page {pagination.page} of {pagination.totalPages} ({pagination.total} total tickets)
+                </p>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    Previous
+                  </button>
+                  <button 
+                    onClick={() => setCurrentPage(p => Math.min(pagination.totalPages, p + 1))}
+                    disabled={currentPage === pagination.totalPages}
+                    className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </motion.div>
         )}
       </section>
     </div>
