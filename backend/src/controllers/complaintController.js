@@ -42,7 +42,7 @@ export const createComplaint = asyncHandler(async (req, res) => {
 });
 
 export const getComplaints = asyncHandler(async (req, res) => {
-  const { priority, status, mine, page, limit, noPaginate } = req.query;
+  const { priority, status, mine, page, limit, noPaginate, sort } = req.query;
   const query = {};
 
   if (priority && priority !== 'All') {
@@ -57,11 +57,31 @@ export const getComplaints = asyncHandler(async (req, res) => {
     query.reportedBy = req.user._id;
   }
 
+  // Define sort object based on requested option
+  let sortObject = { createdAt: -1 }; // Default: Newest first
+
+  if (sort === 'time_asc') {
+    sortObject = { createdAt: 1 };
+  } else if (sort === 'priority_desc') {
+    sortObject = { priorityWeight: -1, createdAt: -1 };
+  } else if (sort === 'priority_asc') {
+    sortObject = { priorityWeight: 1, createdAt: -1 };
+  }
+
+  // Backfill priorityWeight for any old documents dynamically if priority sorting is requested
+  if (sort === 'priority_desc' || sort === 'priority_asc') {
+    await Promise.all([
+      Complaint.updateMany({ priority: 'High', priorityWeight: { $exists: false } }, { $set: { priorityWeight: 3 } }),
+      Complaint.updateMany({ priority: 'Medium', priorityWeight: { $exists: false } }, { $set: { priorityWeight: 2 } }),
+      Complaint.updateMany({ priority: 'Low', priorityWeight: { $exists: false } }, { $set: { priorityWeight: 1 } })
+    ]);
+  }
+
   // Support bypassing pagination for Analytics & Exports (Admin only)
   if (noPaginate === 'true' && req.user.role === 'admin') {
     const allComplaints = await Complaint.find(query)
       .populate('reportedBy', 'name email role')
-      .sort({ createdAt: -1 })
+      .sort(sortObject)
       .lean();
     return res.json({ complaints: allComplaints });
   }
@@ -73,7 +93,7 @@ export const getComplaints = asyncHandler(async (req, res) => {
   const total = await Complaint.countDocuments(query);
   const complaints = await Complaint.find(query)
     .populate('reportedBy', 'name email role')
-    .sort({ createdAt: -1 })
+    .sort(sortObject)
     .skip(startIndex)
     .limit(limitNum)
     .lean();

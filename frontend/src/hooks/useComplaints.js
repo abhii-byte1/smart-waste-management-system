@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '../api/client.js';
 
-const useComplaints = ({ mine = false, priority = '', enabled = true, page = 1, limit = 50, noPaginate = false } = {}) => {
+const useComplaints = ({ mine = false, priority = '', sort = '', enabled = true, page = 1, limit = 50, noPaginate = false } = {}) => {
   const [complaints, setComplaints] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(enabled);
@@ -20,6 +20,7 @@ const useComplaints = ({ mine = false, priority = '', enabled = true, page = 1, 
       const params = { page, limit };
       if (mine) params.mine = true;
       if (priority && priority !== 'All') params.priority = priority;
+      if (sort) params.sort = sort;
       if (noPaginate) params.noPaginate = true;
 
       const { data } = await api.get('/complaints', { params });
@@ -35,7 +36,7 @@ const useComplaints = ({ mine = false, priority = '', enabled = true, page = 1, 
     } finally {
       setLoading(false);
     }
-  }, [enabled, mine, priority, page, limit, noPaginate]);
+  }, [enabled, mine, priority, sort, page, limit, noPaginate]);
 
   useEffect(() => {
     fetchComplaints();

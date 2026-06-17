@@ -29,6 +29,10 @@ const complaintSchema = new mongoose.Schema(
       enum: ['High', 'Medium', 'Low'],
       default: 'Low'
     },
+    priorityWeight: {
+      type: Number,
+      default: 1
+    },
     status: {
       type: String,
       enum: ['Pending', 'In Progress', 'Resolved'],
@@ -44,6 +48,16 @@ const complaintSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+// Pre-save hook to ensure priorityWeight matches priority
+complaintSchema.pre('save', function (next) {
+  if (this.isModified('priority') || this.isNew) {
+    if (this.priority === 'High') this.priorityWeight = 3;
+    else if (this.priority === 'Medium') this.priorityWeight = 2;
+    else this.priorityWeight = 1;
+  }
+  next();
+});
 
 const Complaint = mongoose.model('Complaint', complaintSchema);
 
