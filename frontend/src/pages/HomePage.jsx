@@ -1,8 +1,10 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangle, CheckCircle2, Clock, RefreshCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ComplaintForm from '../components/ComplaintForm.jsx';
 import ComplaintList from '../components/ComplaintList.jsx';
+import CitizenComplaintDrawer from '../components/CitizenComplaintDrawer.jsx';
 import Loader from '../components/Loader.jsx';
 import StatCard from '../components/StatCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -12,10 +14,20 @@ import { buttonTap, fadeInUp, slideInLeft, slideInRight, staggerContainer } from
 const HomePage = () => {
   const { user } = useAuth();
   const { complaints, loading, refetch } = useComplaints({ mine: true, enabled: Boolean(user) });
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   const pendingCount = complaints.filter((item) => item.status === 'Pending').length;
   const resolvedCount = complaints.filter((item) => item.status === 'Resolved').length;
   const highPriorityCount = complaints.filter((item) => item.priority === 'High').length;
+
+  const handleReportClick = (e) => {
+    e.preventDefault();
+    setIsFormVisible(true);
+    setTimeout(() => {
+      document.getElementById('report')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  };
 
   return (
     <div className="space-y-8">
@@ -34,6 +46,7 @@ const HomePage = () => {
               user.role !== 'admin' && (
                 <motion.a
                   href="#report"
+                  onClick={handleReportClick}
                   whileHover={{ scale: 1.04 }}
                   whileTap={buttonTap}
                   className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600"
@@ -63,47 +76,60 @@ const HomePage = () => {
         </motion.div>
       </section>
 
-      <section className="grid gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-        <motion.div id="report" variants={slideInLeft} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
-          {user ? (
-            user.role === 'admin' ? (
-              <div className="rounded-2xl border border-white/[0.06] bg-surface/50 p-5 backdrop-blur sm:rounded-3xl sm:p-8">
-                <h2 className="text-xl font-semibold text-white sm:text-2xl">Admin Portal</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-400 sm:mt-3">
-                  Administrators cannot submit new complaints. Please use the Command Center to manage active reports.
-                </p>
-                <div className="mt-5 sm:mt-6">
-                  <motion.div whileHover={{ scale: 1.04 }} whileTap={buttonTap} className="inline-block">
-                    <Link to="/dashboard" className="inline-block rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
-                      Open Command Center
-                    </Link>
-                  </motion.div>
+      <section className={`grid gap-6 sm:gap-8 ${isFormVisible ? 'lg:grid-cols-[0.95fr_1.05fr]' : 'lg:grid-cols-1'}`}>
+        <AnimatePresence mode="wait">
+          {isFormVisible && (
+            <motion.div 
+              id="report" 
+              initial={{ opacity: 0, height: 0, overflow: 'hidden' }} 
+              animate={{ opacity: 1, height: 'auto', overflow: 'visible' }} 
+              exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
+              transition={{ duration: 0.4 }}
+            >
+              {user ? (
+                user.role === 'admin' ? (
+                  <div className="rounded-2xl border border-white/[0.06] bg-surface/50 p-5 backdrop-blur sm:rounded-3xl sm:p-8">
+                    <h2 className="text-xl font-semibold text-white sm:text-2xl">Admin Portal</h2>
+                    <p className="mt-2 text-sm leading-6 text-slate-400 sm:mt-3">
+                      Administrators cannot submit new complaints. Please use the Command Center to manage active reports.
+                    </p>
+                    <div className="mt-5 sm:mt-6">
+                      <motion.div whileHover={{ scale: 1.04 }} whileTap={buttonTap} className="inline-block">
+                        <Link to="/dashboard" className="inline-block rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
+                          Open Command Center
+                        </Link>
+                      </motion.div>
+                    </div>
+                  </div>
+                ) : (
+                  <ComplaintForm 
+                    onCreated={() => { refetch(); setIsFormVisible(false); }} 
+                    onCancel={() => setIsFormVisible(false)} 
+                  />
+                )
+              ) : (
+                <div className="rounded-2xl border border-white/[0.06] bg-surface/50 p-5 backdrop-blur sm:rounded-3xl sm:p-8">
+                  <h2 className="text-xl font-semibold text-white sm:text-2xl">Sign in to submit a complaint</h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-400 sm:mt-3">
+                    Registration is included in this MVP so both citizens and authorities can use the same platform.
+                  </p>
+                  <div className="mt-5 flex flex-wrap gap-3 sm:mt-6">
+                    <motion.div whileHover={{ scale: 1.04 }} whileTap={buttonTap}>
+                      <Link to="/login" className="inline-block rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
+                        Login
+                      </Link>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.04 }} whileTap={buttonTap}>
+                      <Link to="/register" className="inline-block rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white">
+                        Create Account
+                      </Link>
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <ComplaintForm onCreated={refetch} />
-            )
-          ) : (
-            <div className="rounded-2xl border border-white/[0.06] bg-surface/50 p-5 backdrop-blur sm:rounded-3xl sm:p-8">
-              <h2 className="text-xl font-semibold text-white sm:text-2xl">Sign in to submit a complaint</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-400 sm:mt-3">
-                Registration is included in this MVP so both citizens and authorities can use the same platform.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-3 sm:mt-6">
-                <motion.div whileHover={{ scale: 1.04 }} whileTap={buttonTap}>
-                  <Link to="/login" className="inline-block rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
-                    Login
-                  </Link>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.04 }} whileTap={buttonTap}>
-                  <Link to="/register" className="inline-block rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white">
-                    Create Account
-                  </Link>
-                </motion.div>
-              </div>
-            </div>
+              )}
+            </motion.div>
           )}
-        </motion.div>
+        </AnimatePresence>
 
         <motion.div className="space-y-4 sm:space-y-5" variants={slideInRight} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-50px' }}>
           <div className="flex items-center justify-between gap-4">
@@ -131,11 +157,16 @@ const HomePage = () => {
                 Complaint tracking is available for citizens only.
               </div>
             ) : (
-              loading ? <Loader text="Loading your tickets..." /> : <ComplaintList complaints={complaints} />
+              loading ? <Loader text="Loading your tickets..." /> : <ComplaintList complaints={complaints} onRowClick={setSelectedComplaint} selectedId={selectedComplaint?._id} />
             )
           )}
         </motion.div>
       </section>
+
+      <CitizenComplaintDrawer 
+        complaint={selectedComplaint} 
+        onClose={() => setSelectedComplaint(null)} 
+      />
     </div>
   );
 };

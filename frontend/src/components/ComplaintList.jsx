@@ -3,7 +3,7 @@ import ComplaintCard from './ComplaintCard.jsx';
 import EmptyState from './EmptyState.jsx';
 import { staggerContainer } from '../utils/motion.js';
 
-const ComplaintList = ({ complaints }) => {
+const ComplaintList = ({ complaints, onRowClick, selectedId }) => {
   if (!complaints.length) {
     return (
       <EmptyState
@@ -22,7 +22,12 @@ const ComplaintList = ({ complaints }) => {
     >
       <AnimatePresence mode="popLayout">
         {complaints.map((complaint) => (
-          <ComplaintCard key={complaint._id} complaint={complaint} />
+          <ComplaintCard 
+            key={complaint._id} 
+            complaint={complaint} 
+            onClick={onRowClick}
+            isSelected={selectedId === complaint._id}
+          />
         ))}
       </AnimatePresence>
     </motion.div>

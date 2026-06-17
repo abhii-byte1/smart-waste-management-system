@@ -9,7 +9,7 @@ import LocationPicker from './LocationPicker.jsx';
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 const initialState = { location: '', description: '', image: '', coordinates: null };
 
-const ComplaintForm = ({ onCreated, disabled }) => {
+const ComplaintForm = ({ onCreated, onCancel, disabled }) => {
   const [form, setForm] = useState(initialState);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -69,6 +69,13 @@ const ComplaintForm = ({ onCreated, disabled }) => {
       setForm(initialState); setErrors({}); setFileName(''); onCreated?.();
     } catch (error) { toast.error(error.response?.data?.message || 'Unable to submit ticket.'); }
     finally { setSubmitting(false); }
+  };
+
+  const handleCancel = () => {
+    setForm(initialState);
+    setErrors({});
+    setFileName('');
+    onCancel?.();
   };
 
   const inputClassName = 'mt-2 w-full rounded-xl border border-white/10 bg-ink px-4 py-3 text-sm text-white outline-none transition-all duration-200 focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30';
@@ -135,7 +142,12 @@ const ComplaintForm = ({ onCreated, disabled }) => {
         <motion.button type="submit" disabled={disabled || submitting} whileHover={{ scale: 1.03 }} whileTap={buttonTap} className="w-full rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
           {submitting ? 'Submitting...' : 'Submit Ticket'}
         </motion.button>
-        <p className="text-center text-xs text-slate-500 sm:text-left">Map powered by OpenStreetMap.</p>
+        {onCancel && (
+          <motion.button type="button" onClick={handleCancel} disabled={disabled || submitting} whileHover={{ scale: 1.03 }} whileTap={buttonTap} className="w-full rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+            Cancel
+          </motion.button>
+        )}
+        <p className="mt-2 text-center text-xs text-slate-500 sm:mt-0 sm:ml-auto">Map powered by OpenStreetMap.</p>
       </div>
     </motion.form>
   );
