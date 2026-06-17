@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { AlertTriangle, ClipboardList, RefreshCcw, TrendingUp, Map as MapIcon, Table as TableIcon, BarChart2, Download, ArrowUpDown } from 'lucide-react';
+import { AlertTriangle, ClipboardList, RefreshCcw, TrendingUp, Map as MapIcon, Table as TableIcon, BarChart2, Download } from 'lucide-react';
 import api from '../api/client.js';
 import AdminTable from '../components/AdminTable.jsx';
 import AdminMap from '../components/AdminMap.jsx';
@@ -14,16 +14,8 @@ import { PRIORITY_OPTIONS } from '../utils/constants.js';
 import { exportToCSV, exportToPDF } from '../utils/exportUtils.js';
 import { buttonTap, fadeInUp, staggerContainer } from '../utils/motion.js';
 
-const SORT_OPTIONS = [
-  { value: 'time_desc', label: 'Newest First' },
-  { value: 'time_asc', label: 'Oldest First' },
-  { value: 'priority_desc', label: 'Priority: High to Low' },
-  { value: 'priority_asc', label: 'Priority: Low to High' }
-];
-
 const DashboardPage = () => {
   const [selectedPriority, setSelectedPriority] = useState('All');
-  const [selectedSort, setSelectedSort] = useState('time_desc');
   const [viewMode, setViewMode] = useState('table'); // 'table', 'map', or 'analytics'
   const [busyId, setBusyId] = useState('');
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -33,7 +25,6 @@ const DashboardPage = () => {
   // Paginated data for the Table
   const { complaints: pagedComplaints, pagination, loading, refetch } = useComplaints({ 
     priority: selectedPriority, 
-    sort: selectedSort,
     page: currentPage, 
     limit: 50 
   });
@@ -41,7 +32,6 @@ const DashboardPage = () => {
   // Unpaginated data for Analytics, Maps, and Exports
   const { complaints: allComplaints } = useComplaints({ 
     priority: selectedPriority, 
-    sort: selectedSort,
     noPaginate: true 
   });
 
@@ -128,31 +118,17 @@ const DashboardPage = () => {
               </button>
             </div>
 
-            <div className="flex gap-3">
-              <select
-                value={selectedPriority}
-                onChange={(event) => setSelectedPriority(event.target.value)}
-                className="rounded-xl border border-white/10 bg-ink px-4 py-2.5 text-sm text-white sm:py-3"
-              >
-                {PRIORITY_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option === 'All' ? 'All Priorities' : `${option} Priority`}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={selectedSort}
-                onChange={(event) => setSelectedSort(event.target.value)}
-                className="rounded-xl border border-white/10 bg-ink px-4 py-2.5 text-sm text-white sm:py-3"
-              >
-                {SORT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              value={selectedPriority}
+              onChange={(event) => setSelectedPriority(event.target.value)}
+              className="rounded-xl border border-white/10 bg-ink px-4 py-2.5 text-sm text-white sm:py-3"
+            >
+              {PRIORITY_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option === 'All' ? 'All Priorities' : `${option} Priority`}
+                </option>
+              ))}
+            </select>
 
             <div className="relative">
               <motion.button
