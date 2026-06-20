@@ -6,7 +6,7 @@ import { buttonTap, fadeInUp } from '../utils/motion.js';
 
 import LocationPicker from './LocationPicker.jsx';
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // Increased to 10MB for input, compresses down to <500KB
 const initialState = { location: '', description: '', image: '', coordinates: null };
 
 const ComplaintForm = ({ onCreated, onCancel, disabled }) => {
@@ -64,9 +64,37 @@ const ComplaintForm = ({ onCreated, onCancel, disabled }) => {
     const file = event.target.files?.[0];
     if (!file) { setFileName(''); setForm((c) => ({ ...c, image: '' })); return; }
     if (!file.type.startsWith('image/')) { setErrors((c) => ({ ...c, image: 'Please upload an image file.' })); event.target.value = ''; return; }
-    if (file.size > MAX_FILE_SIZE) { setErrors((c) => ({ ...c, image: 'Image must be smaller than 2 MB.' })); event.target.value = ''; return; }
+    if (file.size > MAX_FILE_SIZE) { setErrors((c) => ({ ...c, image: 'Image must be smaller than 10 MB.' })); event.target.value = ''; return; }
+    
     const reader = new FileReader();
-    reader.onloadend = () => { setForm((c) => ({ ...c, image: reader.result })); setFileName(file.name); setErrors((c) => ({ ...c, image: '' })); };
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDimension = 1200;
+
+        if (width > height && width > maxDimension) {
+          height = Math.round((height * maxDimension) / width);
+          width = maxDimension;
+        } else if (height > maxDimension) {
+          width = Math.round((width * maxDimension) / height);
+          height = maxDimension;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedData = canvas.toDataURL('image/webp', 0.75);
+        setForm((c) => ({ ...c, image: compressedData }));
+        setFileName(file.name);
+        setErrors((c) => ({ ...c, image: '' }));
+      };
+      img.src = e.target.result;
+    };
     reader.readAsDataURL(file);
   };
 
@@ -135,7 +163,7 @@ const ComplaintForm = ({ onCreated, onCancel, disabled }) => {
             Upload Image (optional)
             <input type="file" accept="image/*" onChange={handleFileChange} className="mt-2 block w-full rounded-xl border border-dashed border-white/10 bg-ink px-3 py-3 text-sm text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white" disabled={disabled || submitting} />
           </label>
-          <p className="mt-2 text-xs text-slate-500">Supported image files up to 2 MB.</p>
+          <p className="mt-2 text-xs text-slate-500">Supported image files up to 10 MB. Will be compressed automatically.</p>
           {fileName && <p className="mt-2 text-xs text-brand-400">Selected: {fileName}</p>}
           <AnimatePresence>{errors.image && <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="mt-1 block text-xs text-red-400">{errors.image}</motion.span>}</AnimatePresence>
           <AnimatePresence>

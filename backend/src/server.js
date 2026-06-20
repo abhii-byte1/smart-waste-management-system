@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import helmet from 'helmet';
+import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import { connectDB } from './config/db.js';
@@ -35,6 +36,17 @@ app.use(
     origin: process.env.CLIENT_URL || 'http://localhost:5173'
   })
 );
+
+// Enable Gzip/Brotli compression
+app.use(compression());
+
+// Basic caching for GET requests
+app.use((req, res, next) => {
+  if (req.method === 'GET') {
+    res.set('Cache-Control', 'public, max-age=60'); // Cache for 60 seconds
+  }
+  next();
+});
 
 // 2. Body Parsers must run before sanitizers
 app.use(express.json({ limit: '50mb' }));

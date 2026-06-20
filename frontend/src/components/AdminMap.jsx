@@ -1,4 +1,5 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { PRIORITY_STYLES } from '../utils/constants.js';
@@ -46,32 +47,34 @@ const AdminMap = ({ complaints }) => {
             url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
             className="map-tiles"
           />
-          {validComplaints.map((complaint) => (
-            <Marker 
-              key={complaint._id} 
-              position={[complaint.coordinates.lat, complaint.coordinates.lng]}
-              icon={icons[complaint.priority] || icons.Low}
-            >
-              <Popup className="dark-popup">
-                <div className="flex flex-col gap-2 p-1 max-w-[200px]">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-800">#{complaint.ticketId || 'TKT'}</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${complaint.priority === 'High' ? 'bg-red-100 text-red-700' : complaint.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
-                      {complaint.priority}
-                    </span>
+          <MarkerClusterGroup chunkedLoading maxClusterRadius={60}>
+            {validComplaints.map((complaint) => (
+              <Marker 
+                key={complaint._id} 
+                position={[complaint.coordinates.lat, complaint.coordinates.lng]}
+                icon={icons[complaint.priority] || icons.Low}
+              >
+                <Popup className="dark-popup">
+                  <div className="flex flex-col gap-2 p-1 max-w-[200px]">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-800">#{complaint.ticketId || 'TKT'}</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${complaint.priority === 'High' ? 'bg-red-100 text-red-700' : complaint.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
+                        {complaint.priority}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold text-slate-700 leading-tight">{complaint.location}</p>
+                    <p className="text-xs text-slate-600 line-clamp-3">{complaint.description}</p>
+                    {complaint.image && (
+                      <img src={complaint.image} loading="lazy" alt="Ticket" className="w-full h-24 object-cover rounded mt-1" />
+                    )}
+                    <div className="text-[10px] text-slate-500 mt-1 uppercase font-semibold">
+                      Status: {complaint.status}
+                    </div>
                   </div>
-                  <p className="text-xs font-semibold text-slate-700 leading-tight">{complaint.location}</p>
-                  <p className="text-xs text-slate-600 line-clamp-3">{complaint.description}</p>
-                  {complaint.image && (
-                    <img src={complaint.image} alt="Ticket" className="w-full h-24 object-cover rounded mt-1" />
-                  )}
-                  <div className="text-[10px] text-slate-500 mt-1 uppercase font-semibold">
-                    Status: {complaint.status}
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+                </Popup>
+              </Marker>
+            ))}
+          </MarkerClusterGroup>
         </MapContainer>
         <style>{`
           .leaflet-container {
