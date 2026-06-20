@@ -18,7 +18,7 @@ const TimelineStep = ({ label, isCompleted, isCurrent, isLast }) => (
         <div className="h-2.5 w-2.5 rounded-full bg-white/[0.06]" />
       )}
     </div>
-    <div className={`pb-8 pt-1 ${isCompleted || isCurrent ? 'text-white' : 'text-slate-500'}`}>
+    <div className={`pb-8 pt-1 ${isCompleted || isCurrent ? 'text-white' : 'text-slate-400'}`}>
       <p className="font-medium">{label}</p>
     </div>
   </div>
@@ -74,6 +74,7 @@ const CitizenComplaintDrawer = ({ complaint, onClose }) => {
                 <h2 className="text-lg font-bold text-white">Ticket Tracking</h2>
                 <button
                   onClick={onClose}
+                  aria-label="Close drawer"
                   className="rounded-lg p-2 text-slate-400 transition hover:bg-white/5 hover:text-white"
                 >
                   <X className="h-5 w-5" />
@@ -100,7 +101,7 @@ const CitizenComplaintDrawer = ({ complaint, onClose }) => {
                     {complaint.location}
                   </h3>
                   <div className="mt-2 flex items-center gap-2 text-sm text-slate-400">
-                    <MapPin className="h-4 w-4 text-slate-500" />
+                    <MapPin className="h-4 w-4 text-slate-400" />
                     <span>Location Details</span>
                   </div>
                 </div>
@@ -110,7 +111,7 @@ const CitizenComplaintDrawer = ({ complaint, onClose }) => {
                   <div className="flex items-start justify-between gap-4">
                     <div className="text-sm">
                       <p className="font-medium text-slate-300">Reported By</p>
-                      <div className="mt-1 flex items-center gap-2 text-slate-500">
+                      <div className="mt-1 flex items-center gap-2 text-slate-400">
                         <User2 className="h-4 w-4" />
                         {complaint.reportedBy?.name || 'Citizen'}
                       </div>
@@ -120,7 +121,7 @@ const CitizenComplaintDrawer = ({ complaint, onClose }) => {
                   <div className="flex items-start justify-between gap-4">
                     <div className="text-sm">
                       <p className="font-medium text-slate-300">Submission Date</p>
-                      <div className="mt-1 flex items-center gap-2 text-slate-500">
+                      <div className="mt-1 flex items-center gap-2 text-slate-400">
                         <Calendar className="h-4 w-4" />
                         {formatDateTime(complaint.createdAt)}
                       </div>
@@ -176,6 +177,7 @@ const CitizenComplaintDrawer = ({ complaint, onClose }) => {
                       />
                       <button 
                         onClick={() => setIsLightboxOpen(true)}
+                        aria-label="View evidence fullscreen"
                         className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                       >
                         <div className="flex items-center gap-2 rounded-xl bg-black/60 px-4 py-2 text-sm font-medium text-white backdrop-blur-md">

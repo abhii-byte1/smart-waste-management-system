@@ -23,7 +23,7 @@ const AdminTable = ({ complaints, onStatusChange, onDelete, busyId, onRowClick, 
       <div className="hidden overflow-hidden rounded-2xl border border-white/[0.06] bg-surface/50 backdrop-blur md:block">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm text-slate-300">
-            <thead className="border-b border-white/[0.06] bg-white/[0.02] text-xs uppercase tracking-[0.15em] text-slate-500">
+            <thead className="border-b border-white/[0.06] bg-white/[0.02] text-xs uppercase tracking-[0.15em] text-slate-400">
               <tr>
                 <th className="px-5 py-4">Ticket ID</th>
                 <th className="px-5 py-4">Location</th>
@@ -55,7 +55,7 @@ const AdminTable = ({ complaints, onStatusChange, onDelete, busyId, onRowClick, 
                       </td>
                       <td className="px-5 py-4">
                         <div className="font-medium text-white">{complaint.location}</div>
-                        <div className="mt-1 text-xs text-slate-500">{complaint.reportedBy?.email || 'Anonymous'}</div>
+                        <div className="mt-1 text-xs text-slate-400">{complaint.reportedBy?.email || 'Anonymous'}</div>
                       </td>
                       <td className="max-w-[220px] px-5 py-4 text-slate-400">
                         <div className="flex items-start gap-3">
@@ -87,7 +87,7 @@ const AdminTable = ({ complaints, onStatusChange, onDelete, busyId, onRowClick, 
                           </select>
                         </div>
                       </td>
-                      <td className="px-5 py-4 text-xs text-slate-500">{formatDateTime(complaint.createdAt)}</td>
+                      <td className="px-5 py-4 text-xs text-slate-400">{formatDateTime(complaint.createdAt)}</td>
                       <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                         <motion.button
                           type="button"
@@ -142,12 +142,12 @@ const AdminTable = ({ complaints, onStatusChange, onDelete, busyId, onRowClick, 
                   </span>
                 </div>
                 <h3 className="mt-3 text-sm font-medium text-white">{complaint.location}</h3>
-                <p className="mt-1 text-xs text-slate-500">{complaint.reportedBy?.email || 'Anonymous'}</p>
+                <p className="mt-1 text-xs text-slate-400">{complaint.reportedBy?.email || 'Anonymous'}</p>
                 {complaint.image && (
                   <img src={complaint.image} alt="Issue" className="mt-3 h-32 w-full rounded-xl object-cover border border-white/10" />
                 )}
                 <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-slate-400">{complaint.description}</p>
-                <p className="mt-3 text-xs text-slate-500">{formatDateTime(complaint.createdAt)}</p>
+                <p className="mt-3 text-xs text-slate-400">{formatDateTime(complaint.createdAt)}</p>
                 <div className="mt-3 flex items-center gap-2 border-t border-white/[0.06] pt-3" onClick={(e) => e.stopPropagation()}>
                   <select
                     value={complaint.status}

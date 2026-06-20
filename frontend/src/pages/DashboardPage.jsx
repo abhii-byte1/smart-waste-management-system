@@ -157,6 +157,7 @@ const DashboardPage = () => {
             <select
               value={selectedPriority}
               onChange={(event) => setSelectedPriority(event.target.value)}
+              aria-label="Filter by priority"
               className="rounded-xl border border-white/10 bg-ink px-4 py-2.5 text-sm text-white sm:py-3"
             >
               {PRIORITY_OPTIONS.map((option) => (
@@ -172,6 +173,8 @@ const DashboardPage = () => {
                 onClick={() => setShowExportMenu(!showExportMenu)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={buttonTap}
+                aria-haspopup="true"
+                aria-expanded={showExportMenu}
                 className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition hover:bg-white/10 sm:py-3"
               >
                 <Download className="h-4 w-4" />

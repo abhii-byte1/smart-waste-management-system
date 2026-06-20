@@ -30,17 +30,17 @@ const ComplaintCard = ({ complaint, onClick, isSelected }) => (
     {/* Metadata: User, Location, Date */}
     <div className="mt-4 flex flex-col gap-2 text-xs text-slate-400 sm:mt-5">
       <div className="flex items-center gap-2">
-        <User2 className="h-4 w-4 shrink-0 text-slate-500" />
+        <User2 className="h-4 w-4 shrink-0 text-slate-400" />
         <span className="font-medium text-slate-300">User:</span>
         <span>{complaint.reportedBy?.name || 'Citizen'}</span>
       </div>
       <div className="flex items-center gap-2">
-        <MapPin className="h-4 w-4 shrink-0 text-slate-500" />
+        <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
         <span className="font-medium text-slate-300">Location:</span>
         <span className="line-clamp-1">{complaint.location}</span>
       </div>
       <div className="flex items-center gap-2">
-        <Clock3 className="h-4 w-4 shrink-0 text-slate-500" />
+        <Clock3 className="h-4 w-4 shrink-0 text-slate-400" />
         <span className="font-medium text-slate-300">Date:</span>
         <span>{formatDateTime(complaint.createdAt)}</span>
       </div>

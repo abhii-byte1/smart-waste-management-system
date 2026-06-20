@@ -13,7 +13,7 @@ const SidebarLink = ({ to, icon: Icon, label, onClick }) => (
       `group flex flex-col items-center gap-1 rounded-2xl px-3 py-3 text-[11px] font-medium transition-all duration-200 ${
         isActive
           ? 'bg-brand-500/15 text-brand-400'
-          : 'text-slate-500 hover:bg-white/5 hover:text-slate-300'
+          : 'text-slate-400 hover:bg-white/5 hover:text-slate-300'
       }`
     }
   >
@@ -58,7 +58,7 @@ const AdminLayout = () => {
         <div className="border-t border-white/[0.06] px-2 py-3">
           <button
             onClick={handleLogout}
-            className="flex w-full flex-col items-center gap-1 rounded-2xl px-3 py-3 text-[11px] font-medium text-slate-500 transition hover:bg-white/5 hover:text-red-400"
+            className="flex w-full flex-col items-center gap-1 rounded-2xl px-3 py-3 text-[11px] font-medium text-slate-400 transition hover:bg-white/5 hover:text-red-400"
           >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>
@@ -91,7 +91,7 @@ const AdminLayout = () => {
                   </div>
                   <span className="text-sm font-semibold text-white">Smart Waste</span>
                 </Link>
-                <button onClick={() => setSidebarOpen(false)} className="rounded-lg p-1 text-slate-400 hover:text-white">
+                <button onClick={() => setSidebarOpen(false)} className="rounded-lg p-1 text-slate-400 hover:text-white" aria-label="Close sidebar">
                   <X className="h-5 w-5" />
                 </button>
               </div>

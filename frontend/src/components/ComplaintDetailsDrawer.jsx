@@ -51,6 +51,7 @@ const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, 
                 <h2 className="text-lg font-bold text-white">Ticket Details</h2>
                 <button
                   onClick={onClose}
+                  aria-label="Close drawer"
                   className="rounded-lg p-2 text-slate-400 transition hover:bg-white/5 hover:text-white"
                 >
                   <X className="h-5 w-5" />
@@ -77,7 +78,7 @@ const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, 
                     {complaint.location}
                   </h3>
                   <div className="mt-2 flex items-center gap-2 text-sm text-slate-400">
-                    <MapPin className="h-4 w-4 text-slate-500" />
+                    <MapPin className="h-4 w-4 text-slate-400" />
                     <span>Location Confirmed</span>
                   </div>
                 </div>
@@ -92,6 +93,7 @@ const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, 
                     />
                     <button 
                       onClick={() => setIsLightboxOpen(true)}
+                      aria-label="View evidence fullscreen"
                       className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                     >
                       <div className="flex items-center gap-2 rounded-xl bg-black/60 px-4 py-2 text-sm font-medium text-white backdrop-blur-md">
@@ -114,14 +116,14 @@ const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, 
                   <div className="flex items-start justify-between gap-4">
                     <div className="text-sm">
                       <p className="font-medium text-slate-300">Reported By</p>
-                      <p className="mt-1 text-slate-500">{complaint.reportedBy?.email || 'Anonymous Citizen'}</p>
+                      <p className="mt-1 text-slate-400">{complaint.reportedBy?.email || 'Anonymous Citizen'}</p>
                     </div>
                   </div>
                   <div className="h-px bg-white/5" />
                   <div className="flex items-start justify-between gap-4">
                     <div className="text-sm">
                       <p className="font-medium text-slate-300">Submission Date</p>
-                      <div className="mt-1 flex items-center gap-2 text-slate-500">
+                      <div className="mt-1 flex items-center gap-2 text-slate-400">
                         <Calendar className="h-4 w-4" />
                         {formatDateTime(complaint.createdAt)}
                       </div>

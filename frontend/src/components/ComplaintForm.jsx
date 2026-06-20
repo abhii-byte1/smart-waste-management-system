@@ -140,11 +140,11 @@ const ComplaintForm = ({ onCreated, onCancel, disabled }) => {
       </div>
 
       <div className="mt-5 grid gap-4 sm:mt-6 sm:gap-5">
-        <label className="text-sm text-slate-300">
-          Location Details
-          <input name="location" value={form.location} onChange={handleChange} placeholder="Ex: Near City Hospital, Sector 5" className={inputClassName} disabled={disabled || submitting} />
+        <div className="text-sm text-slate-300">
+          <label htmlFor="complaint-location">Location Details</label>
+          <input id="complaint-location" name="location" value={form.location} onChange={handleChange} placeholder="Ex: Near City Hospital, Sector 5" className={inputClassName} disabled={disabled || submitting} />
           <AnimatePresence>{errors.location && <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="mt-1 block text-xs text-red-400">{errors.location}</motion.span>}</AnimatePresence>
-        </label>
+        </div>
 
         <div className="text-sm text-slate-300">
           <label className="block mb-2">Pinpoint Exact Location</label>
@@ -152,17 +152,15 @@ const ComplaintForm = ({ onCreated, onCancel, disabled }) => {
           <AnimatePresence>{errors.coordinates && <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="mt-2 block text-xs text-red-400">{errors.coordinates}</motion.span>}</AnimatePresence>
         </div>
 
-        <label className="text-sm text-slate-300">
-          Description
-          <textarea name="description" value={form.description} onChange={handleChange} rows="4" placeholder="Describe the issue, smell, overflow, risk level, nearby landmarks, and urgency." className={inputClassName} disabled={disabled || submitting} />
+        <div className="text-sm text-slate-300">
+          <label htmlFor="complaint-description">Description</label>
+          <textarea id="complaint-description" name="description" value={form.description} onChange={handleChange} rows="4" placeholder="Describe the issue, smell, overflow, risk level, nearby landmarks, and urgency." className={inputClassName} disabled={disabled || submitting} />
           <AnimatePresence>{errors.description && <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="mt-1 block text-xs text-red-400">{errors.description}</motion.span>}</AnimatePresence>
-        </label>
+        </div>
 
         <div className="text-sm text-slate-300">
-          <label className="block">
-            Upload Image (optional)
-            <input type="file" accept="image/*" onChange={handleFileChange} className="mt-2 block w-full rounded-xl border border-dashed border-white/10 bg-ink px-3 py-3 text-sm text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white" disabled={disabled || submitting} />
-          </label>
+          <label htmlFor="complaint-image" className="block">Upload Image (optional)</label>
+          <input id="complaint-image" type="file" accept="image/*" onChange={handleFileChange} className="mt-2 block w-full rounded-xl border border-dashed border-white/10 bg-ink px-3 py-3 text-sm text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white" disabled={disabled || submitting} />
           <p className="mt-2 text-xs text-slate-500">Supported image files up to 10 MB. Will be compressed automatically.</p>
           {fileName && <p className="mt-2 text-xs text-brand-400">Selected: {fileName}</p>}
           <AnimatePresence>{errors.image && <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} className="mt-1 block text-xs text-red-400">{errors.image}</motion.span>}</AnimatePresence>

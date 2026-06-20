@@ -12,17 +12,17 @@ const AuthForm = ({ title, subtitle, fields, values, onChange, onSubmit, loading
 
       <motion.form onSubmit={onSubmit} className="mt-6 space-y-4 sm:mt-8 sm:space-y-5" variants={staggerContainer(0.1)} initial="hidden" animate="visible">
         {fields.map((field) => (
-          <motion.label key={field.name} variants={staggerItem} className="block text-sm text-slate-300">
-            {field.label}
-            <input type={field.type} name={field.name} value={values[field.name]} onChange={onChange} placeholder={field.placeholder} className={inputClassName} required />
-          </motion.label>
+          <div key={field.name} className="block text-sm text-slate-300">
+            <label htmlFor={`input-${field.name}`}>{field.label}</label>
+            <input id={`input-${field.name}`} type={field.type} name={field.name} value={values[field.name]} onChange={onChange} placeholder={field.placeholder} className={inputClassName} required />
+          </div>
         ))}
         <motion.button type="submit" disabled={loading} whileHover={{ scale: 1.02 }} whileTap={buttonTap} className="w-full rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60">
           {loading ? 'Please wait...' : submitLabel}
         </motion.button>
       </motion.form>
 
-      <p className="mt-5 text-sm text-slate-500 sm:mt-6">
+      <p className="mt-5 text-sm text-slate-400 sm:mt-6">
         {footerText}{' '}
         <Link to={footerLink} className="font-medium text-brand-400 transition-colors hover:text-brand-300">{footerLabel}</Link>
       </p>

@@ -25,7 +25,7 @@ const StatCard = ({ label, value, subtitle, icon: Icon, glowColor = 'green' }) =
       <div>
         <p className="text-xs font-medium text-slate-400 sm:text-sm">{label}</p>
         <p className="mt-1.5 text-2xl font-bold text-white sm:mt-2 sm:text-3xl lg:text-4xl">{value}</p>
-        {subtitle && <p className="mt-1 text-[11px] text-slate-500 sm:mt-1.5 sm:text-xs">{subtitle}</p>}
+        {subtitle && <p className="mt-1 text-[11px] text-slate-400 sm:mt-1.5 sm:text-xs">{subtitle}</p>}
       </div>
       {Icon && (
         <div className={`rounded-xl p-2 sm:p-2.5 ${iconBgStyles[glowColor]}`}>

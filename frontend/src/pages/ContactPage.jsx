@@ -97,18 +97,18 @@ const ContactPage = () => {
         >
           <h2 className="text-xl font-bold text-white">Send a Message</h2>
           <div className="mt-6 space-y-4">
-            <label className="block text-sm text-slate-300">
-              Name
-              <input type="text" name="name" value={form.name} onChange={handleChange} required className={inputClass} placeholder="John Doe" />
-            </label>
-            <label className="block text-sm text-slate-300">
-              Email
-              <input type="email" name="email" value={form.email} onChange={handleChange} required className={inputClass} placeholder="john@example.com" />
-            </label>
-            <label className="block text-sm text-slate-300">
-              Message
-              <textarea name="message" value={form.message} onChange={handleChange} required rows="4" className={inputClass} placeholder="How can we help?" />
-            </label>
+            <div className="block text-sm text-slate-300">
+              <label htmlFor="contact-name">Name</label>
+              <input id="contact-name" type="text" name="name" value={form.name} onChange={handleChange} required className={inputClass} placeholder="John Doe" />
+            </div>
+            <div className="block text-sm text-slate-300">
+              <label htmlFor="contact-email">Email</label>
+              <input id="contact-email" type="email" name="email" value={form.email} onChange={handleChange} required className={inputClass} placeholder="john@example.com" />
+            </div>
+            <div className="block text-sm text-slate-300">
+              <label htmlFor="contact-message">Message</label>
+              <textarea id="contact-message" name="message" value={form.message} onChange={handleChange} required rows="4" className={inputClass} placeholder="How can we help?" />
+            </div>
           </div>
           <motion.button
             type="submit"

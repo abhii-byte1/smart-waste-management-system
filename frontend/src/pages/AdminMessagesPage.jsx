@@ -87,7 +87,7 @@ const AdminMessagesPage = () => {
                   <h3 className="font-semibold text-white">{msg.name}</h3>
                   <p className="text-xs text-brand-400">{msg.email}</p>
                 </div>
-                <span className="text-[10px] text-slate-500">{new Date(msg.createdAt).toLocaleDateString()}</span>
+                <span className="text-[10px] text-slate-400">{new Date(msg.createdAt).toLocaleDateString()}</span>
               </div>
               <div className="mt-4 flex-1">
                 <p className="text-sm leading-relaxed text-slate-300">{msg.message}</p>

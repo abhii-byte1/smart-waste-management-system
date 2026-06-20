@@ -64,13 +64,13 @@ const AdminFeedbackPage = () => {
                     />
                   ))}
                 </div>
-                <span className="text-[10px] text-slate-500">{new Date(item.createdAt).toLocaleDateString()}</span>
+                <span className="text-[10px] text-slate-400">{new Date(item.createdAt).toLocaleDateString()}</span>
               </div>
               <div className="mt-4 flex-1">
                 {item.message ? (
                   <p className="text-sm italic text-slate-300">"{item.message}"</p>
                 ) : (
-                  <p className="text-sm italic text-slate-500">No comment provided.</p>
+                  <p className="text-sm italic text-slate-400">No comment provided.</p>
                 )}
               </div>
             </motion.div>

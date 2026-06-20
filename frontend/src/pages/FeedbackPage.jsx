@@ -51,7 +51,7 @@ const FeedbackPage = () => {
           Help us improve the Smart Waste Management platform by sharing your experience.
         </p>
         {user && (
-          <p className="mt-3 text-xs text-slate-500">
+          <p className="mt-3 text-xs text-slate-400">
             Submitting as <span className="text-brand-400">{user.email}</span>
           </p>
         )}
@@ -76,6 +76,7 @@ const FeedbackPage = () => {
                   onClick={() => setRating(index)}
                   onMouseEnter={() => setHover(index)}
                   onMouseLeave={() => setHover(rating)}
+                  aria-label={`Rate ${index} out of 5 stars`}
                   className="transition-transform hover:scale-110"
                 >
                   <Star
@@ -90,16 +91,17 @@ const FeedbackPage = () => {
         </div>
 
         <div className="mt-8">
-          <label className="block text-sm text-slate-300">
+          <label htmlFor="feedback-comment" className="block text-sm text-slate-300">
             What could we improve? (Optional)
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              rows="5"
-              className={inputClass}
-              placeholder="Tell us what you liked or what needs work..."
-            />
           </label>
+          <textarea
+            id="feedback-comment"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows="5"
+            className={inputClass}
+            placeholder="Tell us what you liked or what needs work..."
+          />
         </div>
 
         <motion.button
