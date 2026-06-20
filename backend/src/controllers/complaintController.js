@@ -18,8 +18,17 @@ export const createComplaint = asyncHandler(async (req, res) => {
     throw new Error('Uploaded image format is not supported.');
   }
 
-  // Generate a random 6-digit ticket ID
-  const ticketId = Math.floor(100000 + Math.random() * 900000).toString();
+  // Generate a unique 6-digit ticket ID (retry up to 10 times to avoid collision)
+  let ticketId;
+  let attempts = 0;
+  do {
+    ticketId = Math.floor(100000 + Math.random() * 900000).toString();
+    attempts++;
+    if (attempts > 10) {
+      res.status(500);
+      throw new Error('Unable to generate a unique ticket ID. Please try again.');
+    }
+  } while (await Complaint.exists({ ticketId }));
 
   // Upload to Cloudinary if image is present
   let secureImageUrl = '';

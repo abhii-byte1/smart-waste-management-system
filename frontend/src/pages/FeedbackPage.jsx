@@ -4,8 +4,10 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Star } from 'lucide-react';
 import { buttonTap, fadeInUp } from '../utils/motion.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const FeedbackPage = () => {
+  const { user } = useAuth();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
@@ -19,7 +21,14 @@ const FeedbackPage = () => {
     }
     setSubmitting(true);
     try {
-      await api.post('/feedback', { type: 'feedback', rating, message: comment });
+      await api.post('/feedback', {
+        type: 'feedback',
+        rating,
+        message: comment,
+        // Auto-populate from logged-in user so admin can identify who submitted feedback
+        name: user?.name || '',
+        email: user?.email || ''
+      });
       toast.success('Thank you for your feedback!');
       setRating(0);
       setHover(0);
@@ -41,6 +50,11 @@ const FeedbackPage = () => {
         <p className="mx-auto mt-4 max-w-xl text-sm text-slate-400 sm:text-base">
           Help us improve the Smart Waste Management platform by sharing your experience.
         </p>
+        {user && (
+          <p className="mt-3 text-xs text-slate-500">
+            Submitting as <span className="text-brand-400">{user.email}</span>
+          </p>
+        )}
       </motion.div>
 
       <motion.form
@@ -103,3 +117,4 @@ const FeedbackPage = () => {
 };
 
 export default FeedbackPage;
+

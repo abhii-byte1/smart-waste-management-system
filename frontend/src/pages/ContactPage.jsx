@@ -15,6 +15,22 @@ const ContactPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Frontend validation
+    if (!form.name.trim()) {
+      toast.error('Please enter your name.');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email.trim())) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    if (!form.message.trim() || form.message.trim().length < 10) {
+      toast.error('Message must be at least 10 characters.');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await api.post('/feedback', { type: 'contact', ...form });

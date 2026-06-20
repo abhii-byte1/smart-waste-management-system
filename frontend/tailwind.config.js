@@ -44,6 +44,9 @@ export default {
       },
       screens: {
         xs: '475px'
+      },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite'
       }
     }
   },

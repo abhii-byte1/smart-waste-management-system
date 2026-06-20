@@ -30,12 +30,17 @@ const CitizenComplaintDrawer = ({ complaint, onClose }) => {
   // Close drawer on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && !isLightboxOpen) onClose();
-      if (e.key === 'Escape' && isLightboxOpen) setIsLightboxOpen(false);
+      if (e.key === 'Escape') {
+        if (isLightboxOpen) {
+          setIsLightboxOpen(false);
+        } else if (complaint) {
+          onClose();
+        }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, isLightboxOpen]);
+  }, [onClose, isLightboxOpen, complaint]);
 
   if (!complaint) return null;
 

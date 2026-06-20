@@ -141,7 +141,7 @@ const HomePage = () => {
               <motion.button
                 type="button"
                 onClick={refetch}
-                whileHover={{ scale: 1.05, rotate: 90 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={buttonTap}
                 transition={{ duration: 0.3 }}
                 className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white transition hover:bg-white/10 sm:px-4"

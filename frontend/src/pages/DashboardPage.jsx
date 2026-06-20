@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { AlertTriangle, ClipboardList, RefreshCcw, TrendingUp, Map as MapIcon, Table as TableIcon, BarChart2, Download } from 'lucide-react';
@@ -21,6 +21,20 @@ const DashboardPage = () => {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const exportMenuRef = useRef(null);
+
+  // Close export menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
+        setShowExportMenu(false);
+      }
+    };
+    if (showExportMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showExportMenu]);
   
   // Paginated data for the Table
   const { complaints: pagedComplaints, pagination, loading, refetch } = useComplaints({ 
@@ -36,11 +50,28 @@ const DashboardPage = () => {
   });
 
   const stats = useMemo(
-    () => ({
-      total: allComplaints.length,
-      high: allComplaints.filter((item) => item.priority === 'High').length,
-      active: allComplaints.filter((item) => item.status !== 'Resolved').length
-    }),
+    () => {
+      const total = allComplaints.length;
+      const high = allComplaints.filter((item) => item.priority === 'High').length;
+      const active = allComplaints.filter((item) => item.status !== 'Resolved').length;
+
+      // Compute how many complaints were filed in the current calendar month
+      const now = new Date();
+      const thisMonth = allComplaints.filter((c) => {
+        const d = new Date(c.createdAt);
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+      }).length;
+      const lastMonth = allComplaints.filter((c) => {
+        const d = new Date(c.createdAt);
+        const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        return d.getFullYear() === lm.getFullYear() && d.getMonth() === lm.getMonth();
+      }).length;
+      const monthlyChange = lastMonth === 0
+        ? (thisMonth > 0 ? '+100%' : '0% change')
+        : `${thisMonth >= lastMonth ? '+' : ''}${Math.round(((thisMonth - lastMonth) / lastMonth) * 100)}% vs last month`;
+
+      return { total, high, active, monthlyChange };
+    },
     [allComplaints]
   );
 
@@ -130,7 +161,7 @@ const DashboardPage = () => {
               ))}
             </select>
 
-            <div className="relative">
+            <div className="relative" ref={exportMenuRef}>
               <motion.button
                 type="button"
                 onClick={() => setShowExportMenu(!showExportMenu)}
@@ -174,7 +205,7 @@ const DashboardPage = () => {
           initial="hidden"
           animate="visible"
         >
-          <StatCard label="Total Complaints" value={stats.total} subtitle="+15% this month" icon={TrendingUp} glowColor="green" />
+          <StatCard label="Total Complaints" value={stats.total} subtitle={stats.monthlyChange} icon={TrendingUp} glowColor="green" />
           <StatCard label="High Priority" value={stats.high} subtitle="Urgency" icon={AlertTriangle} glowColor="red" />
           <StatCard label="Open Cases" value={stats.active} subtitle="Active assignments" icon={ClipboardList} glowColor="cyan" />
         </motion.div>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '../api/client.js';
 
@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  const login = async (credentials) => {
+  const login = useCallback(async (credentials) => {
     setAuthLoading(true);
     try {
       const { data } = await api.post('/auth/login', credentials);
@@ -32,9 +32,9 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setAuthLoading(false);
     }
-  };
+  }, []);
 
-  const register = async (payload) => {
+  const register = useCallback(async (payload) => {
     setAuthLoading(true);
     try {
       const { data } = await api.post('/auth/register', payload);
@@ -47,12 +47,12 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setAuthLoading(false);
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     toast.success('Logged out.');
-  };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -62,10 +62,11 @@ export const AuthProvider = ({ children }) => {
       register,
       logout
     }),
-    [user, authLoading]
+    [user, authLoading, login, register, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);
+

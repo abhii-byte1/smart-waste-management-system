@@ -29,13 +29,26 @@ const ComplaintForm = ({ onCreated, onCancel, disabled }) => {
   const handleLocationSelect = useCallback(async (coords) => {
     setForm((c) => ({ ...c, coordinates: coords }));
     try {
-      const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.lat}&longitude=${coords.lng}&localityLanguage=en`);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json&accept-language=en`
+      );
       const data = await response.json();
-      if (data) {
-        const addressParts = [data.locality, data.city, data.principalSubdivision].filter(Boolean);
-        if (addressParts.length > 0) {
-          setForm((c) => ({ ...c, location: addressParts.join(', ') }));
-        }
+      if (data && data.address) {
+        const { road, house_number, neighbourhood, suburb, city, town, village, state, postcode } = data.address;
+        const street = house_number && road ? `${house_number} ${road}` : (road || '');
+        const area = neighbourhood || suburb || '';
+        const locality = city || town || village || '';
+        
+        const addressParts = [
+          street,
+          area,
+          locality,
+          state,
+          postcode
+        ].filter(Boolean);
+
+        const finalAddress = addressParts.length > 0 ? addressParts.join(', ') : (data.display_name || '');
+        setForm((c) => ({ ...c, location: finalAddress }));
       }
     } catch (error) {
       console.error('Error fetching address:', error);

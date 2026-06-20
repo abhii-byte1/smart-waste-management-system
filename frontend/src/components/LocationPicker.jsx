@@ -1,15 +1,10 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import { RefreshCcw } from 'lucide-react';
+import { applyLeafletIconFix } from '../utils/leafletIconFix.js';
 
-// Fix for default marker icons in React-Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+applyLeafletIconFix();
 
 const LocationMarker = ({ position, setPosition }) => {
   useMapEvents({
@@ -34,6 +29,20 @@ const MapUpdater = ({ center }) => {
 const LocationPicker = ({ onLocationSelect }) => {
   const [position, setPosition] = useState(null);
   const [center, setCenter] = useState([40.7128, -74.0060]); // Default NYC
+
+  const handleRefreshLocation = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coords = [pos.coords.latitude, pos.coords.longitude];
+          setCenter(coords);
+          setPosition(coords);
+        },
+        (err) => console.log('Geolocation error:', err.message),
+        { enableHighAccuracy: true }
+      );
+    }
+  };
 
   useEffect(() => {
     if ('geolocation' in navigator) {
@@ -71,6 +80,17 @@ const LocationPicker = ({ onLocationSelect }) => {
         <LocationMarker position={position} setPosition={setPosition} />
         <MapUpdater center={center} />
       </MapContainer>
+
+      <button
+        type="button"
+        onClick={handleRefreshLocation}
+        className="absolute bottom-4 right-4 z-[1000] flex items-center gap-1.5 rounded-xl border border-white/10 bg-slate-950/80 px-3.5 py-2.5 text-xs font-semibold text-slate-200 shadow-xl backdrop-blur-md transition-all duration-200 hover:bg-slate-900 hover:text-white active:scale-95 hover:border-brand-500/30"
+        title="Refresh & Recenter Current Location"
+      >
+        <RefreshCcw className="h-3.5 w-3.5" />
+        <span>Locate Me</span>
+      </button>
+
       <style>{`
         .leaflet-container {
           background-color: #0f172a; /* Slate 900 */
