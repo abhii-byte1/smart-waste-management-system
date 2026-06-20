@@ -37,17 +37,22 @@ const DashboardPage = () => {
   }, [showExportMenu]);
   
   // Paginated data for the Table
-  const { complaints: pagedComplaints, pagination, loading, refetch } = useComplaints({ 
+  const { complaints: pagedComplaints, pagination, loading, refetch: refetchPaged } = useComplaints({ 
     priority: selectedPriority, 
     page: currentPage, 
     limit: 50 
   });
 
   // Unpaginated data for Analytics, Maps, and Exports
-  const { complaints: allComplaints } = useComplaints({ 
+  const { complaints: allComplaints, refetch: refetchAll } = useComplaints({ 
     priority: selectedPriority, 
     noPaginate: true 
   });
+
+  const refetch = () => {
+    refetchPaged();
+    refetchAll();
+  };
 
   const stats = useMemo(
     () => {
