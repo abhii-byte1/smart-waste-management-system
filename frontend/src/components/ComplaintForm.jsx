@@ -133,7 +133,7 @@ const ComplaintForm = ({ onCreated, onCancel, disabled }) => {
         <div className="text-sm text-slate-300">
           <label className="block">
             Upload Image (optional)
-            <input type="file" accept="image/*" capture="environment" onChange={handleFileChange} className="mt-2 block w-full rounded-xl border border-dashed border-white/10 bg-ink px-3 py-3 text-sm text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white" disabled={disabled || submitting} />
+            <input type="file" accept="image/*" onChange={handleFileChange} className="mt-2 block w-full rounded-xl border border-dashed border-white/10 bg-ink px-3 py-3 text-sm text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-500 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white" disabled={disabled || submitting} />
           </label>
           <p className="mt-2 text-xs text-slate-500">Supported image files up to 2 MB.</p>
           {fileName && <p className="mt-2 text-xs text-brand-400">Selected: {fileName}</p>}
