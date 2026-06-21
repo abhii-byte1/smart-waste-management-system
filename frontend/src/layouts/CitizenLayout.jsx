@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { BarChart3, Home, Info, LogOut, Menu, MessageSquare, Phone, ShieldCheck, Trash2, User, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { pageTransition } from '../utils/motion.js';
+import SkipLink from '../components/SkipLink.jsx';
 
 const SidebarLink = ({ to, icon: Icon, label, onClick }) => (
   <NavLink
@@ -28,6 +29,11 @@ const CitizenLayout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Automatically close sidebar on route changes
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
   const handleLogout = () => {
     logout();
     setSidebarOpen(false);
@@ -36,16 +42,17 @@ const CitizenLayout = () => {
 
   return (
     <div className="flex min-h-screen">
+      <SkipLink />
       {/* ═══ Desktop Sidebar ═══ */}
-      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[80px] flex-col border-r border-white/[0.06] bg-ink/90 backdrop-blur-xl md:flex">
+      <aside className="fixed left-0 top-0 z-40 hidden h-screen w-[80px] flex-col border-r border-white/[0.06] bg-ink/90 backdrop-blur-xl md:flex" aria-label="Main navigation">
         <div className="flex h-16 items-center justify-center border-b border-white/[0.06]">
-          <Link to="/">
-            <motion.div
-              whileHover={{ rotate: [0, -8, 8, 0], transition: { duration: 0.5 } }}
-              className="rounded-xl bg-brand-500/15 p-2.5 ring-1 ring-brand-500/30"
-            >
-              <Trash2 className="h-5 w-5 text-brand-400" />
-            </motion.div>
+          <Link to="/" className="flex items-center justify-center p-2">
+            <motion.img
+              whileHover={{ scale: 1.05, transition: { duration: 0.3 } }}
+              src="/logo.png"
+              alt="Smart Waste Logo"
+              className="h-10 w-auto rounded-xl object-contain"
+            />
           </Link>
         </div>
 
@@ -101,10 +108,8 @@ const CitizenLayout = () => {
               className="fixed left-0 top-0 z-50 h-screen w-[260px] border-r border-white/[0.06] bg-ink/95 backdrop-blur-xl md:hidden"
             >
               <div className="flex h-16 items-center justify-between border-b border-white/[0.06] px-5">
-                <Link to="/" onClick={() => setSidebarOpen(false)} className="flex items-center gap-2.5">
-                  <div className="rounded-xl bg-brand-500/15 p-2 ring-1 ring-brand-500/30">
-                    <Trash2 className="h-4 w-4 text-brand-400" />
-                  </div>
+                <Link to="/" className="flex items-center gap-2.5">
+                  <img src="/logo.png" alt="Smart Waste Logo" className="h-8 w-auto rounded-lg object-contain" />
                   <span className="text-sm font-semibold text-white">Smart Waste</span>
                 </Link>
                 <button onClick={() => setSidebarOpen(false)} className="rounded-lg p-1 text-slate-400 hover:text-white" aria-label="Close sidebar">
@@ -114,7 +119,6 @@ const CitizenLayout = () => {
               <nav className="space-y-1 px-3 py-4">
                 <NavLink
                   to="/"
-                  onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition ${isActive ? 'bg-brand-500/15 text-brand-400' : 'text-slate-300 hover:bg-white/5'}`
                   }
@@ -125,7 +129,6 @@ const CitizenLayout = () => {
                   <>
                     <NavLink
                       to="/about"
-                      onClick={() => setSidebarOpen(false)}
                       className={({ isActive }) =>
                         `flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition ${isActive ? 'bg-brand-500/15 text-brand-400' : 'text-slate-300 hover:bg-white/5'}`
                       }
@@ -134,7 +137,6 @@ const CitizenLayout = () => {
                     </NavLink>
                     <NavLink
                       to="/contact"
-                      onClick={() => setSidebarOpen(false)}
                       className={({ isActive }) =>
                         `flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition ${isActive ? 'bg-brand-500/15 text-brand-400' : 'text-slate-300 hover:bg-white/5'}`
                       }
@@ -143,7 +145,6 @@ const CitizenLayout = () => {
                     </NavLink>
                     <NavLink
                       to="/feedback"
-                      onClick={() => setSidebarOpen(false)}
                       className={({ isActive }) =>
                         `flex items-center gap-3 rounded-xl px-4 py-3 text-sm transition ${isActive ? 'bg-brand-500/15 text-brand-400' : 'text-slate-300 hover:bg-white/5'}`
                       }
@@ -172,10 +173,10 @@ const CitizenLayout = () => {
                   </>
                 ) : (
                   <>
-                    <NavLink to="/login" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-300 hover:bg-white/5">
+                    <NavLink to="/login" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-300 hover:bg-white/5">
                       <User className="h-5 w-5" /> Login
                     </NavLink>
-                    <NavLink to="/register" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-300 hover:bg-white/5">
+                    <NavLink to="/register" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-300 hover:bg-white/5">
                       <User className="h-5 w-5" /> Register
                     </NavLink>
                   </>
@@ -236,7 +237,7 @@ const CitizenLayout = () => {
         </motion.header>
 
         {/* Page content */}
-        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <main id="main-content" className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
