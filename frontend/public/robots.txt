@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /login
+Allow: /register
+
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://smart-waste-management.onrender.com/sitemap.xml

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { buttonTap, fadeInUp, staggerContainer, staggerItem } from '../utils/motion.js';
+import PageMeta from '../components/PageMeta.jsx';
 
 const ContactPage = () => {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -47,6 +48,11 @@ const ContactPage = () => {
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 py-8">
+      <PageMeta
+        title="Contact"
+        description="Contact the Smart Waste Management support team for platform questions or urgent civic issues."
+        path="/contact"
+      />
       <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-brand-400">Get in Touch</p>
         <h1 className="mt-4 text-3xl font-bold text-white sm:text-5xl">Contact Us</h1>

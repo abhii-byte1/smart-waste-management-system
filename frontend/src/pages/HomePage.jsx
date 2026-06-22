@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertTriangle, CheckCircle2, Clock, RefreshCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -10,6 +10,7 @@ import StatCard from '../components/StatCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import useComplaints from '../hooks/useComplaints.js';
 import { buttonTap, fadeInUp, slideInLeft, slideInRight, staggerContainer } from '../utils/motion.js';
+import PageMeta from '../components/PageMeta.jsx';
 
 const HomePage = () => {
   const { user } = useAuth();
@@ -17,9 +18,9 @@ const HomePage = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
-  const pendingCount = complaints.filter((item) => item.status === 'Pending').length;
-  const resolvedCount = complaints.filter((item) => item.status === 'Resolved').length;
-  const highPriorityCount = complaints.filter((item) => item.priority === 'High').length;
+  const pendingCount = useMemo(() => complaints.filter((item) => item.status === 'Pending').length, [complaints]);
+  const resolvedCount = useMemo(() => complaints.filter((item) => item.status === 'Resolved').length, [complaints]);
+  const highPriorityCount = useMemo(() => complaints.filter((item) => item.priority === 'High').length, [complaints]);
 
   const handleReportClick = (e) => {
     e.preventDefault();
@@ -31,6 +32,11 @@ const HomePage = () => {
 
   return (
     <div className="space-y-8">
+      <PageMeta
+        title="Smart Waste Management — Report Civic Issues"
+        description="Submit waste issue tickets, track resolution status, and help keep your city clean."
+        path="/"
+      />
       <section className="grid gap-6 rounded-2xl border border-white/[0.06] bg-surface/50 bg-hero-grid bg-hero-grid bg-top p-5 backdrop-blur sm:rounded-3xl sm:p-8 lg:grid-cols-[1.2fr_0.8fr]">
         <motion.div variants={slideInLeft} initial="hidden" animate="visible">
           <p className="text-xs uppercase tracking-[0.3em] text-brand-400 sm:text-sm">Clean cities, faster action</p>
@@ -95,7 +101,7 @@ const HomePage = () => {
                     </p>
                     <div className="mt-5 sm:mt-6">
                       <motion.div whileHover={{ scale: 1.04 }} whileTap={buttonTap} className="inline-block">
-                        <Link to="/dashboard" className="inline-block rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
+                        <Link to="/admin/dashboard" className="inline-block rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white">
                           Open Command Center
                         </Link>
                       </motion.div>

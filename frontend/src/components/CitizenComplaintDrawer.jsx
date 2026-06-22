@@ -2,7 +2,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, Calendar, MapPin, Hash, User2, Maximize2, CheckCircle2, CircleDashed, CheckCircle } from 'lucide-react';
 import { PRIORITY_STYLES, STATUS_STYLES } from '../utils/constants.js';
 import { formatDateTime } from '../utils/formatters.js';
-import { useState, useEffect } from 'react';
+import { complaintImageAlt, lazyImageProps } from '../utils/imageUtils.js';
+import useFocusTrap from '../hooks/useFocusTrap.js';
+import { useState, useRef } from 'react';
 
 const TimelineStep = ({ label, isCompleted, isCurrent, isLast }) => (
   <div className="relative flex gap-4">
@@ -26,21 +28,16 @@ const TimelineStep = ({ label, isCompleted, isCurrent, isLast }) => (
 
 const CitizenComplaintDrawer = ({ complaint, onClose }) => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const drawerRef = useRef(null);
+  const titleId = 'citizen-complaint-title';
 
-  // Close drawer on Escape key
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        if (isLightboxOpen) {
-          setIsLightboxOpen(false);
-        } else if (complaint) {
-          onClose();
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, isLightboxOpen, complaint]);
+  useFocusTrap(Boolean(complaint) && !isLightboxOpen, drawerRef, () => {
+    if (isLightboxOpen) {
+      setIsLightboxOpen(false);
+    } else {
+      onClose();
+    }
+  });
 
   if (!complaint) return null;
 
@@ -64,6 +61,10 @@ const CitizenComplaintDrawer = ({ complaint, onClose }) => {
 
             {/* Drawer */}
             <motion.div
+              ref={drawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={titleId}
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
@@ -71,7 +72,7 @@ const CitizenComplaintDrawer = ({ complaint, onClose }) => {
               className="fixed right-0 top-0 z-50 flex h-screen w-full max-w-md flex-col overflow-y-auto border-l border-white/[0.06] bg-ink/95 shadow-2xl backdrop-blur-xl sm:w-[450px]"
             >
               <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/[0.06] bg-ink/90 px-6 py-4 backdrop-blur-xl">
-                <h2 className="text-lg font-bold text-white">Ticket Tracking</h2>
+                <h2 id={titleId} className="text-lg font-bold text-white">Ticket Tracking</h2>
                 <button
                   onClick={onClose}
                   aria-label="Close drawer"
@@ -172,7 +173,10 @@ const CitizenComplaintDrawer = ({ complaint, onClose }) => {
                     <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/50">
                       <img 
                         src={complaint.image} 
-                        alt="Complaint evidence" 
+                        alt={complaintImageAlt(complaint)}
+                        width={640}
+                        height={224}
+                        {...lazyImageProps}
                         className="h-56 w-full object-cover transition duration-300 group-hover:opacity-75"
                       />
                       <button 
@@ -206,6 +210,7 @@ const CitizenComplaintDrawer = ({ complaint, onClose }) => {
             <button 
               className="absolute right-6 top-6 rounded-full bg-white/10 p-3 text-white backdrop-blur-md transition hover:bg-white/20"
               onClick={() => setIsLightboxOpen(false)}
+              aria-label="Close enlarged image"
             >
               <X className="h-6 w-6" />
             </button>

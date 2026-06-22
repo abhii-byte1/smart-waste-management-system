@@ -1,29 +1,32 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { AlertTriangle, ClipboardList, RefreshCcw, TrendingUp, Map as MapIcon, Table as TableIcon, BarChart2, Download } from 'lucide-react';
 import api from '../api/client.js';
 import AdminTable from '../components/AdminTable.jsx';
-import AdminMap from '../components/AdminMap.jsx';
-import AnalyticsDashboard from '../components/AnalyticsDashboard.jsx';
 import ComplaintDetailsDrawer from '../components/ComplaintDetailsDrawer.jsx';
 import Loader from '../components/Loader.jsx';
+import PageMeta from '../components/PageMeta.jsx';
 import StatCard from '../components/StatCard.jsx';
 import useComplaints from '../hooks/useComplaints.js';
+import useComplaintStats from '../hooks/useComplaintStats.js';
 import { PRIORITY_OPTIONS } from '../utils/constants.js';
-import { exportToCSV, exportToPDF } from '../utils/exportUtils.js';
 import { buttonTap, fadeInUp, staggerContainer } from '../utils/motion.js';
+
+const AdminMap = lazy(() => import('../components/AdminMap.jsx'));
+const AnalyticsDashboard = lazy(() => import('../components/AnalyticsDashboard.jsx'));
 
 const DashboardPage = () => {
   const [selectedPriority, setSelectedPriority] = useState('All');
-  const [viewMode, setViewMode] = useState('table'); // 'table', 'map', or 'analytics'
+  const [viewMode, setViewMode] = useState('table');
   const [busyId, setBusyId] = useState('');
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const exportMenuRef = useRef(null);
 
-  // Close export menu when clicking outside
+  const needsFullDataset = viewMode === 'map' || viewMode === 'analytics';
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
@@ -35,62 +38,74 @@ const DashboardPage = () => {
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showExportMenu]);
-  
-  // Paginated data for the Table
-  const { complaints: pagedComplaints, pagination, loading, refetch: refetchPaged } = useComplaints({ 
-    priority: selectedPriority, 
-    page: currentPage, 
-    limit: 50 
+
+  const {
+    complaints: pagedComplaints,
+    pagination,
+    loading: tableLoading,
+    refetch: refetchPaged
+  } = useComplaints({
+    priority: selectedPriority,
+    page: currentPage,
+    limit: 50
   });
 
-  // Unpaginated data for Analytics, Maps, and Exports
-  const { complaints: allComplaints, refetch: refetchAll } = useComplaints({ 
-    priority: selectedPriority, 
-    noPaginate: true 
+  const {
+    complaints: fullComplaints,
+    loading: fullLoading,
+    refetch: refetchFull
+  } = useComplaints({
+    priority: selectedPriority,
+    noPaginate: true,
+    enabled: needsFullDataset
   });
 
-  const refetch = () => {
+  const { stats, refetch: refetchStats } = useComplaintStats(selectedPriority);
+
+  const refetch = useCallback(() => {
     refetchPaged();
-    refetchAll();
+    refetchStats();
+    if (needsFullDataset) refetchFull();
+  }, [refetchPaged, refetchStats, refetchFull, needsFullDataset]);
+
+  const fetchExportData = async () => {
+    if (fullComplaints.length) return fullComplaints;
+    const params = { noPaginate: true };
+    if (selectedPriority && selectedPriority !== 'All') params.priority = selectedPriority;
+    const { data } = await api.get('/complaints', { params });
+    return data.complaints || [];
   };
 
-  const stats = useMemo(
-    () => {
-      const total = allComplaints.length;
-      const high = allComplaints.filter((item) => item.priority === 'High').length;
-      const active = allComplaints.filter((item) => item.status !== 'Resolved').length;
+  const handleExportPDF = async () => {
+    try {
+      const data = await fetchExportData();
+      const { exportToPDF } = await import('../utils/exportUtils.js');
+      exportToPDF(data);
+      setShowExportMenu(false);
+    } catch {
+      toast.error('Unable to export PDF.');
+    }
+  };
 
-      // Compute how many complaints were filed in the current calendar month
-      const now = new Date();
-      const thisMonth = allComplaints.filter((c) => {
-        const d = new Date(c.createdAt);
-        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-      }).length;
-      const lastMonth = allComplaints.filter((c) => {
-        const d = new Date(c.createdAt);
-        const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        return d.getFullYear() === lm.getFullYear() && d.getMonth() === lm.getMonth();
-      }).length;
-      const monthlyChange = lastMonth === 0
-        ? (thisMonth > 0 ? '+100%' : '0% change')
-        : `${thisMonth >= lastMonth ? '+' : ''}${Math.round(((thisMonth - lastMonth) / lastMonth) * 100)}% vs last month`;
-
-      return { total, high, active, monthlyChange };
-    },
-    [allComplaints]
-  );
+  const handleExportCSV = async () => {
+    try {
+      const data = await fetchExportData();
+      const { exportToCSV } = await import('../utils/exportUtils.js');
+      exportToCSV(data);
+      setShowExportMenu(false);
+    } catch {
+      toast.error('Unable to export CSV.');
+    }
+  };
 
   const handleStatusChange = async (id, status) => {
     setBusyId(id);
     try {
       await api.put(`/complaints/${id}`, { status });
       toast.success('Status updated.');
-      
-      // Update local state for drawer if it's currently open
       if (selectedComplaint && selectedComplaint._id === id) {
-        setSelectedComplaint(prev => ({ ...prev, status }));
+        setSelectedComplaint((prev) => ({ ...prev, status }));
       }
-      
       refetch();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Unable to update status.');
@@ -115,8 +130,16 @@ const DashboardPage = () => {
     }
   };
 
+  const sectionLoading = viewMode === 'table' ? tableLoading : fullLoading;
+
   return (
     <div className="space-y-6 sm:space-y-8">
+      <PageMeta
+        title="Admin Dashboard"
+        description="Admin command center for waste complaint operations."
+        path="/admin/dashboard"
+        noIndex
+      />
       <motion.section
         variants={fadeInUp}
         initial="hidden"
@@ -133,21 +156,27 @@ const DashboardPage = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex bg-ink rounded-xl border border-white/10 overflow-hidden">
+            <div className="flex bg-ink rounded-xl border border-white/10 overflow-hidden" role="group" aria-label="Dashboard view mode">
               <button
+                type="button"
                 onClick={() => setViewMode('table')}
+                aria-pressed={viewMode === 'table'}
                 className={`flex items-center gap-2 px-4 py-2.5 text-sm transition ${viewMode === 'table' ? 'bg-brand-500 text-white font-medium' : 'text-slate-400 hover:text-white'}`}
               >
                 <TableIcon className="w-4 h-4" /> Table
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('map')}
+                aria-pressed={viewMode === 'map'}
                 className={`flex items-center gap-2 px-4 py-2.5 text-sm transition border-l border-white/5 ${viewMode === 'map' ? 'bg-brand-500 text-white font-medium' : 'text-slate-400 hover:text-white'}`}
               >
                 <MapIcon className="w-4 h-4" /> Map
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('analytics')}
+                aria-pressed={viewMode === 'analytics'}
                 className={`flex items-center gap-2 px-4 py-2.5 text-sm transition border-l border-white/5 ${viewMode === 'analytics' ? 'bg-brand-500 text-white font-medium' : 'text-slate-400 hover:text-white'}`}
               >
                 <BarChart2 className="w-4 h-4" /> Analytics
@@ -156,7 +185,10 @@ const DashboardPage = () => {
 
             <select
               value={selectedPriority}
-              onChange={(event) => setSelectedPriority(event.target.value)}
+              onChange={(event) => {
+                setSelectedPriority(event.target.value);
+                setCurrentPage(1);
+              }}
               aria-label="Filter by priority"
               className="rounded-xl border border-white/10 bg-ink px-4 py-2.5 text-sm text-white sm:py-3"
             >
@@ -173,21 +205,21 @@ const DashboardPage = () => {
                 onClick={() => setShowExportMenu(!showExportMenu)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={buttonTap}
-                aria-haspopup="true"
+                aria-haspopup="menu"
                 aria-expanded={showExportMenu}
                 className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white transition hover:bg-white/10 sm:py-3"
               >
                 <Download className="h-4 w-4" />
                 Export
               </motion.button>
-              
+
               {showExportMenu && (
-                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-white/10 bg-slate-800 shadow-xl z-50 overflow-hidden">
-                  <button onClick={() => { exportToPDF(allComplaints); setShowExportMenu(false); }} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition">
-                    📄 Export as PDF
+                <div role="menu" className="absolute right-0 mt-2 w-48 rounded-xl border border-white/10 bg-slate-800 shadow-xl z-50 overflow-hidden">
+                  <button type="button" role="menuitem" onClick={handleExportPDF} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition">
+                    Export as PDF
                   </button>
-                  <button onClick={() => { exportToCSV(allComplaints); setShowExportMenu(false); }} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition border-t border-white/5">
-                    📊 Export as CSV
+                  <button type="button" role="menuitem" onClick={handleExportCSV} className="w-full text-left px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition border-t border-white/5">
+                    Export as CSV
                   </button>
                 </div>
               )}
@@ -195,7 +227,10 @@ const DashboardPage = () => {
 
             <motion.button
               type="button"
-              onClick={() => { setCurrentPage(1); refetch(); }}
+              onClick={() => {
+                setCurrentPage(1);
+                refetch();
+              }}
               whileHover={{ scale: 1.05 }}
               whileTap={buttonTap}
               transition={{ duration: 0.3 }}
@@ -220,42 +255,48 @@ const DashboardPage = () => {
       </motion.section>
 
       <section>
-        {loading ? (
+        {sectionLoading ? (
           <Loader text="Loading dashboard..." />
         ) : viewMode === 'map' ? (
           <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-            <AdminMap complaints={allComplaints} />
+            <Suspense fallback={<Loader text="Loading map..." />}>
+              <AdminMap complaints={fullComplaints} />
+            </Suspense>
           </motion.div>
         ) : viewMode === 'analytics' ? (
           <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-            <AnalyticsDashboard complaints={allComplaints} />
+            <Suspense fallback={<Loader text="Loading analytics..." />}>
+              <AnalyticsDashboard complaints={fullComplaints} />
+            </Suspense>
           </motion.div>
         ) : (
           <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-            <AdminTable 
-              complaints={pagedComplaints} 
-              onStatusChange={handleStatusChange} 
-              onDelete={handleDelete} 
-              busyId={busyId} 
+            <AdminTable
+              complaints={pagedComplaints}
+              onStatusChange={handleStatusChange}
+              onDelete={handleDelete}
+              busyId={busyId}
               onRowClick={setSelectedComplaint}
               selectedId={selectedComplaint?._id}
             />
-            
+
             {pagination && pagination.totalPages > 1 && (
               <div className="mt-6 flex items-center justify-between border-t border-white/[0.06] pt-6">
                 <p className="text-sm text-slate-400">
                   Showing page {pagination.page} of {pagination.totalPages} ({pagination.total} total tickets)
                 </p>
                 <div className="flex gap-2">
-                  <button 
-                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                     className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
                   >
                     Previous
                   </button>
-                  <button 
-                    onClick={() => setCurrentPage(p => Math.min(pagination.totalPages, p + 1))}
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))}
                     disabled={currentPage === pagination.totalPages}
                     className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
                   >
@@ -267,10 +308,10 @@ const DashboardPage = () => {
           </motion.div>
         )}
       </section>
-      
-      <ComplaintDetailsDrawer 
-        complaint={selectedComplaint} 
-        onClose={() => setSelectedComplaint(null)} 
+
+      <ComplaintDetailsDrawer
+        complaint={selectedComplaint}
+        onClose={() => setSelectedComplaint(null)}
         onStatusChange={handleStatusChange}
         onDelete={handleDelete}
         busyId={busyId}

@@ -1,10 +1,16 @@
 import { motion } from 'framer-motion';
 import { Leaf, Shield, Zap } from 'lucide-react';
 import { fadeInUp, staggerContainer, staggerItem } from '../utils/motion.js';
+import PageMeta from '../components/PageMeta.jsx';
 
 const AboutPage = () => {
   return (
     <div className="mx-auto max-w-4xl space-y-12 py-8">
+      <PageMeta
+        title="About Us"
+        description="Learn how Smart Waste Management connects citizens and authorities with AI-powered complaint prioritization."
+        path="/about"
+      />
       <motion.section
         variants={fadeInUp}
         initial="hidden"

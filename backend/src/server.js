@@ -37,20 +37,28 @@ app.use(
   })
 );
 
-// Enable Gzip/Brotli compression
-app.use(compression());
+// Gzip compression — tuned for mobile bandwidth (skip tiny responses)
+app.use(
+  compression({
+    level: 6,
+    threshold: 1024,
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) return false;
+      return compression.filter(req, res);
+    }
+  })
+);
 
-// Basic caching for GET requests
-app.use((req, res, next) => {
-  if (req.method === 'GET') {
-    res.set('Cache-Control', 'public, max-age=60'); // Cache for 60 seconds
-  }
+// API responses must never be cached by shared proxies
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'private, no-store, no-cache, must-revalidate');
+  res.set('Pragma', 'no-cache');
   next();
 });
 
 // 2. Body Parsers must run before sanitizers
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // 3. Security Middlewares
 app.use(helmet({
@@ -80,11 +88,24 @@ app.use('/api/feedback', feedbackRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   const frontendDist = path.resolve(__dirname, '../../frontend/dist');
-  app.use(express.static(frontendDist));
-
-  app.get('*', (req, res) =>
-    res.sendFile(path.join(frontendDist, 'index.html'))
+  app.use(
+    express.static(frontendDist, {
+      maxAge: '1y',
+      immutable: true,
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('index.html')) {
+          res.setHeader('Cache-Control', 'no-cache');
+        } else if (/\.(js|css|woff2?|png|jpg|jpeg|webp|svg|ico)$/.test(filePath)) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        }
+      }
+    })
   );
+
+  app.get('*', (req, res) => {
+    res.set('Cache-Control', 'no-cache');
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
 } else {
   app.get('/', (req, res) => {
     res.send('API is running...');

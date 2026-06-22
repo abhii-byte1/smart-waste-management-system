@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { Star } from 'lucide-react';
 import { buttonTap, fadeInUp } from '../utils/motion.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import PageMeta from '../components/PageMeta.jsx';
 
 const FeedbackPage = () => {
   const { user } = useAuth();
@@ -44,6 +45,7 @@ const FeedbackPage = () => {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 py-8">
+      <PageMeta title="Feedback" description="Share feedback to help improve the Smart Waste Management platform." path="/feedback" noIndex />
       <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="text-center">
         <p className="text-sm uppercase tracking-[0.3em] text-brand-400">Your Opinion Matters</p>
         <h1 className="mt-4 text-3xl font-bold text-white sm:text-5xl">App Feedback</h1>
@@ -66,12 +68,14 @@ const FeedbackPage = () => {
       >
         <div className="flex flex-col items-center">
           <h2 className="text-lg font-medium text-white">How would you rate your experience?</h2>
-          <div className="mt-6 flex gap-2">
+          <div className="mt-6 flex gap-2" role="radiogroup" aria-label="Rate your experience out of 5 stars">
             {[1, 2, 3, 4, 5].map((index) => {
               const isFilled = index <= (hover || rating);
               return (
                 <button
                   type="button"
+                  role="radio"
+                  aria-checked={rating === index}
                   key={index}
                   onClick={() => setRating(index)}
                   onMouseEnter={() => setHover(index)}

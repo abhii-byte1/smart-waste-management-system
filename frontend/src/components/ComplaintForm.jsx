@@ -5,8 +5,9 @@ import api from '../api/client.js';
 import { buttonTap, fadeInUp } from '../utils/motion.js';
 
 import LocationPicker from './LocationPicker.jsx';
+import { compressImageFile } from '../utils/imageUtils.js';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // Increased to 10MB for input, compresses down to <500KB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const initialState = { location: '', description: '', image: '', coordinates: null };
 
 const ComplaintForm = ({ onCreated, onCancel, disabled }) => {
@@ -66,36 +67,16 @@ const ComplaintForm = ({ onCreated, onCancel, disabled }) => {
     if (!file.type.startsWith('image/')) { setErrors((c) => ({ ...c, image: 'Please upload an image file.' })); event.target.value = ''; return; }
     if (file.size > MAX_FILE_SIZE) { setErrors((c) => ({ ...c, image: 'Image must be smaller than 10 MB.' })); event.target.value = ''; return; }
     
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        const maxDimension = 1200;
-
-        if (width > height && width > maxDimension) {
-          height = Math.round((height * maxDimension) / width);
-          width = maxDimension;
-        } else if (height > maxDimension) {
-          width = Math.round((width * maxDimension) / height);
-          height = maxDimension;
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const compressedData = canvas.toDataURL('image/webp', 0.75);
+    compressImageFile(file, { maxDimension: 1024, quality: 0.68 })
+      .then((compressedData) => {
         setForm((c) => ({ ...c, image: compressedData }));
         setFileName(file.name);
         setErrors((c) => ({ ...c, image: '' }));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      })
+      .catch(() => {
+        setErrors((c) => ({ ...c, image: 'Unable to process this image.' }));
+        event.target.value = '';
+      });
   };
 
   const clearImage = () => { setForm((c) => ({ ...c, image: '' })); setFileName(''); setErrors((c) => ({ ...c, image: '' })); };

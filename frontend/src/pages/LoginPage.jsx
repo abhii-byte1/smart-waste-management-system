@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import PageMeta from '../components/PageMeta.jsx';
 
 const initialState = {
   email: '',
@@ -30,6 +31,7 @@ const LoginPage = () => {
 
   return (
     <section className="flex min-h-[60vh] items-center justify-center px-4 sm:min-h-[70vh]">
+      <PageMeta title="Login" description="Sign in to Smart Waste Management to report and track civic waste issues." path="/login" />
       <AuthForm
         title="Welcome Back"
         subtitle="Log in as a citizen or admin to continue managing complaints."

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import PageMeta from '../components/PageMeta.jsx';
 
 const initialState = {
   name: '',
@@ -31,6 +32,7 @@ const RegisterPage = () => {
 
   return (
     <section className="flex min-h-[60vh] items-center justify-center px-4 sm:min-h-[70vh]">
+      <PageMeta title="Register" description="Create a Smart Waste Management account to report waste issues in your area." path="/register" />
       <AuthForm
         title="Create Account"
         subtitle="Start reporting waste issues in your area with real-time tracking."

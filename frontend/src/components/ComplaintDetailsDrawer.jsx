@@ -2,26 +2,22 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, Calendar, MapPin, Hash, CheckCircle, Trash2, Download, Maximize2 } from 'lucide-react';
 import { PRIORITY_STYLES, STATUS_OPTIONS, STATUS_STYLES } from '../utils/constants.js';
 import { formatDateTime } from '../utils/formatters.js';
-import { exportSingleComplaintPDF } from '../utils/exportUtils.js';
-import { useState, useEffect } from 'react';
+import { complaintImageAlt, lazyImageProps } from '../utils/imageUtils.js';
+import useFocusTrap from '../hooks/useFocusTrap.js';
+import { useState, useRef } from 'react';
 
 const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, busyId }) => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const drawerRef = useRef(null);
+  const titleId = 'complaint-details-title';
 
-  // Close drawer on Escape key
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        if (isLightboxOpen) {
-          setIsLightboxOpen(false);
-        } else if (complaint) {
-          onClose();
-        }
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, isLightboxOpen, complaint]);
+  useFocusTrap(Boolean(complaint) && !isLightboxOpen, drawerRef, () => {
+    if (isLightboxOpen) {
+      setIsLightboxOpen(false);
+    } else {
+      onClose();
+    }
+  });
 
   if (!complaint) return null;
 
@@ -41,6 +37,10 @@ const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, 
 
             {/* Drawer */}
             <motion.div
+              ref={drawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={titleId}
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
@@ -48,7 +48,7 @@ const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, 
               className="fixed right-0 top-0 z-50 flex h-screen w-full max-w-md flex-col overflow-y-auto border-l border-white/[0.06] bg-ink/95 shadow-2xl backdrop-blur-xl sm:w-[450px]"
             >
               <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/[0.06] bg-ink/90 px-6 py-4 backdrop-blur-xl">
-                <h2 className="text-lg font-bold text-white">Ticket Details</h2>
+                <h2 id={titleId} className="text-lg font-bold text-white">Ticket Details</h2>
                 <button
                   onClick={onClose}
                   aria-label="Close drawer"
@@ -88,7 +88,10 @@ const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, 
                   <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/50">
                     <img 
                       src={complaint.image} 
-                      alt="Complaint" 
+                      alt={complaintImageAlt(complaint)}
+                      width={640}
+                      height={224}
+                      {...lazyImageProps}
                       className="h-56 w-full object-cover transition duration-300 group-hover:opacity-75"
                     />
                     <button 
@@ -141,6 +144,7 @@ const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, 
                         value={complaint.status}
                         onChange={(e) => onStatusChange(complaint._id, e.target.value)}
                         disabled={busyId === complaint._id}
+                        aria-label="Update ticket status"
                         className="flex-1 rounded-xl border border-white/10 bg-ink px-4 py-3 text-sm text-white transition focus:border-brand-500"
                       >
                         {STATUS_OPTIONS.map((status) => (
@@ -161,7 +165,10 @@ const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, 
 
                     <div className="flex items-center gap-3">
                       <button
-                        onClick={() => exportSingleComplaintPDF(complaint)}
+                        onClick={async () => {
+                          const { exportSingleComplaintPDF } = await import('../utils/exportUtils.js');
+                          exportSingleComplaintPDF(complaint);
+                        }}
                         className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
                       >
                         <Download className="h-4 w-4" /> Download PDF
@@ -199,6 +206,7 @@ const ComplaintDetailsDrawer = ({ complaint, onClose, onStatusChange, onDelete, 
             <button 
               className="absolute right-6 top-6 rounded-full bg-white/10 p-3 text-white backdrop-blur-md transition hover:bg-white/20"
               onClick={() => setIsLightboxOpen(false)}
+              aria-label="Close enlarged image"
             >
               <X className="h-6 w-6" />
             </button>

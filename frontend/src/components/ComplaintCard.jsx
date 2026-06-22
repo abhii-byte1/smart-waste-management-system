@@ -3,10 +3,25 @@ import { Clock3, MapPin, User2 } from 'lucide-react';
 import { PRIORITY_STYLES, STATUS_STYLES } from '../utils/constants.js';
 import { formatDateTime } from '../utils/formatters.js';
 import { staggerItem } from '../utils/motion.js';
+import { complaintImageAlt, lazyImageProps } from '../utils/imageUtils.js';
 
-const ComplaintCard = ({ complaint, onClick, isSelected }) => (
+const ComplaintCard = ({ complaint, onClick, isSelected }) => {
+  const handleActivate = () => onClick?.(complaint);
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleActivate();
+    }
+  };
+
+  return (
   <motion.article
-    onClick={() => onClick?.(complaint)}
+    onClick={handleActivate}
+    onKeyDown={handleKeyDown}
+    role="button"
+    tabIndex={0}
+    aria-pressed={isSelected}
+    aria-label={`View ticket ${complaint.ticketId || 'details'} — ${complaint.status}, ${complaint.priority} priority`}
     variants={staggerItem}
     layout
     whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
@@ -58,7 +73,10 @@ const ComplaintCard = ({ complaint, onClick, isSelected }) => (
       <div className="mt-4">
         <motion.img
           src={complaint.image}
-          alt="Complaint evidence"
+          alt={complaintImageAlt(complaint)}
+          width={640}
+          height={360}
+          {...lazyImageProps}
           className="h-36 w-full rounded-xl object-cover ring-1 ring-white/10 sm:h-48"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -67,6 +85,7 @@ const ComplaintCard = ({ complaint, onClick, isSelected }) => (
       </div>
     )}
   </motion.article>
-);
+  );
+};
 
 export default ComplaintCard;

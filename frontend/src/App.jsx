@@ -1,11 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import AdminLayout from './layouts/AdminLayout.jsx';
-import CitizenLayout from './layouts/CitizenLayout.jsx';
 import { useAuth } from './context/AuthContext.jsx';
-import Loader from './components/Loader.jsx';
+import PageLoader from './components/PageLoader.jsx';
 
-// Lazy loaded pages
+const CitizenLayout = lazy(() => import('./layouts/CitizenLayout.jsx'));
+const AdminLayout = lazy(() => import('./layouts/AdminLayout.jsx'));
+
 const AboutPage = lazy(() => import('./pages/AboutPage.jsx'));
 const ContactPage = lazy(() => import('./pages/ContactPage.jsx'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx'));
@@ -32,19 +32,24 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
 
 const CitizenOnlyRoute = ({ children }) => {
   const { user } = useAuth();
-  
+
   if (user && user.role === 'admin') {
     return <Navigate to="/admin/dashboard" replace />;
   }
-  
+
   return children;
 };
 
 const App = () => (
-  <Suspense fallback={<div className="flex h-screen items-center justify-center bg-slate-950"><Loader text="Loading page..." /></div>}>
+  <Suspense fallback={<PageLoader />}>
     <Routes>
-      {/* Citizen Routes */}
-      <Route element={<CitizenLayout />}>
+      <Route
+        element={
+          <Suspense fallback={<PageLoader text="Loading layout..." />}>
+            <CitizenLayout />
+          </Suspense>
+        }
+      >
         <Route path="/" element={<CitizenOnlyRoute><HomePage /></CitizenOnlyRoute>} />
         <Route path="/about" element={<ProtectedRoute><CitizenOnlyRoute><AboutPage /></CitizenOnlyRoute></ProtectedRoute>} />
         <Route path="/contact" element={<ProtectedRoute><CitizenOnlyRoute><ContactPage /></CitizenOnlyRoute></ProtectedRoute>} />
@@ -53,8 +58,14 @@ const App = () => (
         <Route path="/register" element={<CitizenOnlyRoute><RegisterPage /></CitizenOnlyRoute>} />
       </Route>
 
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route
+        path="/admin"
+        element={
+          <Suspense fallback={<PageLoader text="Loading admin..." />}>
+            <AdminLayout />
+          </Suspense>
+        }
+      >
         <Route
           path="dashboard"
           element={
@@ -81,7 +92,6 @@ const App = () => (
         />
       </Route>
 
-      {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </Suspense>

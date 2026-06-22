@@ -5,6 +5,44 @@ import asyncHandler from '../utils/asyncHandler.js';
 
 const allowedStatuses = ['Pending', 'In Progress', 'Resolved'];
 
+export const getComplaintStats = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error('Admin access required.');
+  }
+
+  const { priority } = req.query;
+  const query = {};
+
+  if (priority && priority !== 'All') {
+    query.priority = priority;
+  }
+
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  const [total, high, active, thisMonth, lastMonth] = await Promise.all([
+    Complaint.countDocuments(query),
+    Complaint.countDocuments({ ...query, priority: 'High' }),
+    Complaint.countDocuments({ ...query, status: { $ne: 'Resolved' } }),
+    Complaint.countDocuments({ ...query, createdAt: { $gte: thisMonthStart } }),
+    Complaint.countDocuments({
+      ...query,
+      createdAt: { $gte: lastMonthStart, $lt: thisMonthStart }
+    })
+  ]);
+
+  const monthlyChange =
+    lastMonth === 0
+      ? thisMonth > 0
+        ? '+100% vs last month'
+        : '0% vs last month'
+      : `${thisMonth >= lastMonth ? '+' : ''}${Math.round(((thisMonth - lastMonth) / lastMonth) * 100)}% vs last month`;
+
+  res.json({ total, high, active, monthlyChange });
+});
+
 export const createComplaint = asyncHandler(async (req, res) => {
   const { location, coordinates, description, image } = req.body;
 

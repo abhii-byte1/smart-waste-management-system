@@ -4,7 +4,9 @@ const complaintSchema = new mongoose.Schema(
   {
     ticketId: {
       type: String,
-      required: true
+      required: true,
+      unique: true,
+      index: true
     },
     location: {
       type: String,
@@ -27,7 +29,8 @@ const complaintSchema = new mongoose.Schema(
     priority: {
       type: String,
       enum: ['High', 'Medium', 'Low'],
-      default: 'Low'
+      default: 'Low',
+      index: true
     },
     priorityWeight: {
       type: Number,
@@ -36,12 +39,14 @@ const complaintSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ['Pending', 'In Progress', 'Resolved'],
-      default: 'Pending'
+      default: 'Pending',
+      index: true
     },
     reportedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true
+      required: true,
+      index: true
     }
   },
   {
@@ -58,6 +63,9 @@ complaintSchema.pre('save', function (next) {
   }
   next();
 });
+
+complaintSchema.index({ createdAt: -1 });
+complaintSchema.index({ priorityWeight: -1, createdAt: -1 });
 
 const Complaint = mongoose.model('Complaint', complaintSchema);
 

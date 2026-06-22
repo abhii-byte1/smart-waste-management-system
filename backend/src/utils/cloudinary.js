@@ -25,8 +25,8 @@ export const uploadImage = async (base64Image) => {
       folder: 'smart_waste_management',
       // Auto-optimize quality and format for performance
       transformation: [
-        { width: 800, crop: 'limit' },
-        { quality: 'auto' },
+        { width: 640, crop: 'limit' },
+        { quality: 'auto:low' },
         { fetch_format: 'auto' }
       ]
     });
